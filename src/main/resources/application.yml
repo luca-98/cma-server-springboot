@@ -1,0 +1,26 @@
+spring:
+    application:
+        name: CMA - Clinic Management Application
+    datasource:
+        url: jdbc:postgresql://117.1.234.205:5432/postgres?currentSchema=cma
+        username: postgres
+        password: 12345678
+    flyway:
+        schemas: cma
+    jpa:
+        show-sql: false
+        properties:
+            hibernate:
+                enable_lazy_load_no_trans: true
+
+server:
+  error:
+    include-stacktrace: never
+
+cma:
+    # gateway-server-url: https://cmateam.herokuapp.com/server-ip
+    token-secret-key: Th!siSs3cretK3y
+    token-header-string: Authorization
+    token-prefix: Bearer
+    token-expiration: 604800000 # token's expiry date: 7 day
+    template-patients: classpath:file/Template_Danh_Sach_Benh_Nhan.xlsx
