@@ -13,7 +13,10 @@ public interface MedicineRepository extends JpaRepository<MedicineEntity, UUID> 
 	@Query("select m from MedicineEntity m join m.groupMedicineByGroupMedicineId gm where gm.id = ?1 and m.status <> 0")
 	List<MedicineEntity> getAllMedicineByGroupId(UUID groupId);
 
-	@Query("select m from MedicineEntity m where m.medicineName like ?1 and m.status <> 0")
-	List<MedicineEntity> searchMedicineByName(String medicineName);
+	@Query("select m from MedicineEntity m where m.medicineNameSearch like ?1 and m.status <> 0")
+	List<MedicineEntity> searchMedicineByName(String medicineNameSearch);
+
+	@Query("select m from MedicineEntity m where m.medicineName like ?1")
+	MedicineEntity getMedicineByName(String medicineName);
 
 }

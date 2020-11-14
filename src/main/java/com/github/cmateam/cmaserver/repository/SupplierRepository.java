@@ -10,7 +10,7 @@ import java.util.UUID;
 import com.github.cmateam.cmaserver.entity.SupplierEntity;
 
 public interface SupplierRepository extends JpaRepository<SupplierEntity, UUID> {
-	@Query("select s from SupplierEntity s where s.supplierName like ?1 and s.status <> 0")
+	@Query("select s from SupplierEntity s where s.supplierNameSearch like ?1 and s.status <> 0")
 	List<SupplierEntity> findByNameSearch(String supplierNameSearch, Pageable top10);
 
 	@Query("select s from SupplierEntity s where s.address like ?1 and s.status <> 0")

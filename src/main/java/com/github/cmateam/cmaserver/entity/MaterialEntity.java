@@ -7,6 +7,7 @@ import java.util.List;
 @Table(name = "material", schema = "cma", catalog = "postgres")
 public class MaterialEntity extends BaseEntity {
     private String materialName;
+    private String materialNameSearch;
     private String unitName;
     private Integer quantity;
     private GroupMaterialEntity groupMaterialByGroupMaterialId;
@@ -20,6 +21,16 @@ public class MaterialEntity extends BaseEntity {
 
     public void setMaterialName(String materialName) {
         this.materialName = materialName;
+    }
+
+    @Basic
+    @Column(name = "material_name_search")
+    public String getMaterialNameSearch() {
+        return this.materialNameSearch;
+    }
+
+    public void setMaterialNameSearch(String materialNameSearch) {
+        this.materialNameSearch = materialNameSearch;
     }
 
     @Basic

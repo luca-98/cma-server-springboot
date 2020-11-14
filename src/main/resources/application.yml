@@ -2,7 +2,7 @@ spring:
     application:
         name: CMA - Clinic Management Application
     datasource:
-        url: jdbc:postgresql://117.1.234.205:5432/postgres?currentSchema=cma
+        url: jdbc:postgresql://27.73.23.55:5432/postgres?currentSchema=cma
         username: postgres
         password: 12345678
     flyway:

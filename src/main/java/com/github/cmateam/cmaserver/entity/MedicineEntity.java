@@ -7,6 +7,7 @@ import java.util.List;
 @Table(name = "medicine", schema = "cma", catalog = "postgres")
 public class MedicineEntity extends BaseEntity {
     private String medicineName;
+    private String medicineNameSearch;
     private Long price;
     private String unitName;
     private Short quantity;
@@ -23,6 +24,16 @@ public class MedicineEntity extends BaseEntity {
 
     public void setMedicineName(String medicineName) {
         this.medicineName = medicineName;
+    }
+
+    @Basic
+    @Column(name = "medicine_name_search")
+    public String getMedicineNameSearch() {
+        return this.medicineNameSearch;
+    }
+
+    public void setMedicineNameSearch(String medicineNameSearch) {
+        this.medicineNameSearch = medicineNameSearch;
     }
 
     @Basic

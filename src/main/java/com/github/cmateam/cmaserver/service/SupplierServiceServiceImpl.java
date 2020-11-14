@@ -15,10 +15,12 @@ import com.github.cmateam.cmaserver.repository.SupplierRepository;
 @Service
 public class SupplierServiceServiceImpl {
 	private SupplierRepository supplierRepository;
+	private VNCharacterUtils vNCharacterUtils;
 
 	@Autowired
-	public SupplierServiceServiceImpl(SupplierRepository supplierRepository) {
+	public SupplierServiceServiceImpl(SupplierRepository supplierRepository, VNCharacterUtils vNCharacterUtils) {
 		this.supplierRepository = supplierRepository;
+		this.vNCharacterUtils = vNCharacterUtils;
 	}
 
 	public SupplierDTO convertSupplierDTO(SupplierEntity se) {
@@ -35,7 +37,7 @@ public class SupplierServiceServiceImpl {
 
 	public List<SupplierDTO> searchByName(String supplierName) {
 		Pageable top10 = PageRequest.of(0, 10);
-		supplierName = '%' + supplierName + '%';
+		supplierName = '%' + vNCharacterUtils.removeAccent(supplierName).toLowerCase() + '%';
 		List<SupplierEntity> listSupplier = supplierRepository.findByNameSearch(supplierName, top10);
 		List<SupplierDTO> sdto = new ArrayList<>();
 		for (SupplierEntity se : listSupplier) {

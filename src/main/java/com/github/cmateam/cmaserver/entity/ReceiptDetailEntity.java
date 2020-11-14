@@ -7,7 +7,6 @@ import javax.persistence.*;
 public class ReceiptDetailEntity extends BaseEntity {
     private Short quantity;
     private Long amount;
-    private Long amountPaid;
     private ReceiptEntity receiptByReceiptId;
     private MedicineEntity medicineByMedicineId;
     private MaterialEntity materialByMaterialId;
@@ -30,16 +29,6 @@ public class ReceiptDetailEntity extends BaseEntity {
 
     public void setAmount(Long amount) {
         this.amount = amount;
-    }
-
-    @Basic
-    @Column(name = "amount_paid")
-    public Long getAmountPaid() {
-        return amountPaid;
-    }
-
-    public void setAmountPaid(Long amountPaid) {
-        this.amountPaid = amountPaid;
     }
 
     @ManyToOne

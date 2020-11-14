@@ -14,10 +14,12 @@ import com.github.cmateam.cmaserver.repository.MedicineRepository;
 @Service
 public class MedicineImpl {
 	private MedicineRepository medicineRepository;
+	private VNCharacterUtils vNCharacterUtils;
 
 	@Autowired
-	public MedicineImpl(MedicineRepository medicineRepository) {
+	public MedicineImpl(MedicineRepository medicineRepository, VNCharacterUtils vNCharacterUtils) {
 		this.medicineRepository = medicineRepository;
+		this.vNCharacterUtils = vNCharacterUtils;
 	}
 
 	public MedicineDTO convertDTO(MedicineEntity me) {
@@ -40,9 +42,9 @@ public class MedicineImpl {
 		return lstDto;
 	}
 
-	public List<MedicineDTO> searchMedicineByName(String medicineName) {
-		medicineName = '%' + medicineName + '%';
-		List<MedicineEntity> lstMedicine = medicineRepository.searchMedicineByName(medicineName);
+	public List<MedicineDTO> searchMedicineByName(String medicineNameSearch) {
+		medicineNameSearch = '%' + vNCharacterUtils.removeAccent(medicineNameSearch).toLowerCase() + '%';
+		List<MedicineEntity> lstMedicine = medicineRepository.searchMedicineByName(medicineNameSearch);
 		List<MedicineDTO> lstDto = new ArrayList<>();
 		for (MedicineEntity me : lstMedicine) {
 			lstDto.add(convertDTO(me));

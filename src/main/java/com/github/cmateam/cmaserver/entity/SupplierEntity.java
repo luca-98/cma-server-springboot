@@ -7,6 +7,7 @@ import java.util.List;
 @Table(name = "supplier", schema = "cma", catalog = "postgres")
 public class SupplierEntity extends BaseEntity {
     private String supplierName;
+    private String supplierNameSearch;
     private String address;
     private String phone;
     private String email;
@@ -25,6 +26,16 @@ public class SupplierEntity extends BaseEntity {
 
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
+    }
+
+    @Basic
+    @Column(name = "supplier_name_search")
+    public String getSupplierNameSearch() {
+        return this.supplierNameSearch;
+    }
+
+    public void setSupplierNameSearch(String supplierNameSearch) {
+        this.supplierNameSearch = supplierNameSearch;
     }
 
     @Basic

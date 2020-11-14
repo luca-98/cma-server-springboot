@@ -133,20 +133,22 @@ public class PrescriptionServiceImpl {
 		PrescriptionDetailTableDTO pdto = new PrescriptionDetailTableDTO();
 		for (int index = 0; index < prescriptionUpdateDTO.getLstMedicineDetail().size(); index++) {
 			PrescriptionDetailEntity pde = null;
+			boolean isAddNewDetail = true;
 			pdto = prescriptionUpdateDTO.getLstMedicineDetail().get(index);
 			if (prescriptionUpdateDTO.getLstMedicineDetail().get(index).getId() != null) {
 				pde = prescriptionDetailRepository
 						.getOne(prescriptionUpdateDTO.getLstMedicineDetail().get(index).getId());
 				if (pde != null) {
-					isAddNew = false;
+					isAddNewDetail = false;
 				}
 			}
-			if (isAddNew) {
+			if (isAddNewDetail) {
 				pde = new PrescriptionDetailEntity();
 				pde.setStatus(1);
 				pde.setMedicineByMedicineId(medicineRepository.getOne(pdto.getMedicineId()));
 				pde.setPrescriptionByPrescriptionId(pe);
 				pde.setCreatedAt(new Date());
+				pde.setUpdatedAt(new Date());
 			} else {
 				pde.setUpdatedAt(new Date());
 			}

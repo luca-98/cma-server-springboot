@@ -57,4 +57,7 @@ public interface MedicalExaminationRepository extends JpaRepository<MedicalExami
 
         @Query("FROM MedicalExaminationEntity m JOIN m.patientByPatientId p WHERE m.status=5 AND p.id=?1 ORDER BY m.createdAt DESC")
         List<MedicalExaminationEntity> findByPatientId(UUID patientId);
+
+        @Query("FROM MedicalExaminationEntity m WHERE m.id=?1 AND date_trunc('day', m.createdAt)=date_trunc('day', now())")
+        MedicalExaminationEntity getByIdToday(UUID id);
 }
