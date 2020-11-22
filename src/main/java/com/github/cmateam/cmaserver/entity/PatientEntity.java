@@ -23,6 +23,7 @@ public class PatientEntity extends BaseEntity {
     private List<PaymentVoucherEntity> paymentVouchersById;
     private List<ReceiptVoucherEntity> receiptVouchersById;
     private List<ReceivePatientEntity> receivePatientsById;
+    private List<MedicineSaleEntity> medicineSalesById;
 
     @Basic
     @Column(name = "patient_name")
@@ -176,4 +177,14 @@ public class PatientEntity extends BaseEntity {
     public void setReceivePatientsById(List<ReceivePatientEntity> receivePatientsById) {
         this.receivePatientsById = receivePatientsById;
     }
+
+    @OneToMany(mappedBy = "patientByPatientId")
+    public List<MedicineSaleEntity> getMedicineSalesById() {
+        return this.medicineSalesById;
+    }
+
+    public void setMedicineSalesById(List<MedicineSaleEntity> medicineSalesById) {
+        this.medicineSalesById = medicineSalesById;
+    }
+
 }

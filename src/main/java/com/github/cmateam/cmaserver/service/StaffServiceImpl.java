@@ -175,4 +175,9 @@ public class StaffServiceImpl {
 		}
 		return ret;
 	}
+
+	public List<String> getGroupServiceCodeByStaff(String username) {
+		StaffEntity s = getStaffEntityByUsername(username);
+		return staffRepository.getGroupServiceCodeByStaff(s.getId());
+	}
 }

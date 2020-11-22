@@ -22,7 +22,7 @@ public class PrintFormServiceImpl {
 	}
 
 	public List<PrintFormDTO> getAllPrintForm() {
-		List<PrintFormEntity> listFormEntity = printFormRepositority.findAll();
+		List<PrintFormEntity> listFormEntity = printFormRepositority.findAllByOrderByPrintNameAsc();
 		List<PrintFormDTO> listFormDto = new ArrayList<>();
 		for (PrintFormEntity pf : listFormEntity) {
 			PrintFormDTO printFormDTO = new PrintFormDTO();
@@ -44,23 +44,17 @@ public class PrintFormServiceImpl {
 			return printFormDTO;
 		}
 		printFormDTO.setId(printFormEntity.getId());
-		printFormDTO.setPrintCode(printFormEntity.getPrintCode());
 		printFormDTO.setPrintName(printFormEntity.getPrintName());
-		printFormDTO.setStatus(printFormEntity.getStatus());
+		printFormDTO.setPrintCode(printFormEntity.getPrintCode());
+		printFormDTO.setTemplateHTML(printFormEntity.getTemplateHTML());
 		printFormDTO.setCreatedAt(printFormEntity.getCreatedAt());
 		printFormDTO.setUpdatedAt(printFormEntity.getUpdatedAt());
+		printFormDTO.setStatus(printFormEntity.getStatus());
 
 		return printFormDTO;
 	}
 
-	// public PrintFormDTO updatePrintFormById(UUID id, String name, String template, Integer status) {
-	// 	PrintFormEntity pe = printFormRepositority.getOne(id);
-
-	// 	printFormRepositority.save(pe);
-	// 	PrintFormDTO printDto = new PrintFormDTO();
-	// 	printDto.setPrintName(pe.getPrintName());
-	// 	printDto.setStatus(pe.getStatus());
-	// 	printDto.setTemplateHTML(pe.getTemplateHTML());
-	// 	return printDto;
-	// }
+	public PrintFormEntity update(PrintFormEntity entity) {
+		return printFormRepositority.save(entity);
+	}
 }

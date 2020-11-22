@@ -10,8 +10,19 @@ public class PrescriptionDetailEntity extends BaseEntity {
     private String note;
     private PrescriptionEntity prescriptionByPrescriptionId;
     private MedicineEntity medicineByMedicineId;
-
+    private Short quantityTaken;
+    
     @Basic
+    @Column(name = "quantity_taken")
+    public Short getQuantityTaken() {
+		return quantityTaken;
+	}
+
+	public void setQuantityTaken(Short quantityTaken) {
+		this.quantityTaken = quantityTaken;
+	}
+
+	@Basic
     @Column(name = "quantity")
     public Short getQuantity() {
         return quantity;

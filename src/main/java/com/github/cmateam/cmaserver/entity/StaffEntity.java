@@ -28,11 +28,22 @@ public class StaffEntity extends BaseEntity {
     private List<ServiceEntity> servicesById;
     private List<ServiceReportEntity> serviceReportsById;
     private AppUserEntity appUserByAppUserId;
-    private List<TemplateReportEntity> templateReportsById;
     private List<OrdinalNumberEntity> ordinalNumbersById;
     private List<GroupServiceEntity> groupServicesById;
+    private List<MedicineSaleEntity> medicineSalesById;
+    private String staffNameSearch;
 
-    @Basic
+	@Basic
+    @Column(name = "staff_name_search")
+    public String getStaffNameSearch() {
+		return staffNameSearch;
+	}
+
+	public void setStaffNameSearch(String staffNameSearch) {
+		this.staffNameSearch = staffNameSearch;
+	}
+
+	@Basic
     @Column(name = "full_name")
     public String getFullName() {
         return fullName;
@@ -203,15 +214,6 @@ public class StaffEntity extends BaseEntity {
     }
 
     @OneToMany(mappedBy = "staffByStaffId")
-    public List<TemplateReportEntity> getTemplateReportsById() {
-        return templateReportsById;
-    }
-
-    public void setTemplateReportsById(List<TemplateReportEntity> templateReportsById) {
-        this.templateReportsById = templateReportsById;
-    }
-
-    @OneToMany(mappedBy = "staffByStaffId")
     public List<OrdinalNumberEntity> getOrdinalNumbersById() {
         return this.ordinalNumbersById;
     }
@@ -228,6 +230,15 @@ public class StaffEntity extends BaseEntity {
 
     public void setGroupServicesById(List<GroupServiceEntity> groupServicesById) {
         this.groupServicesById = groupServicesById;
+    }
+
+    @OneToMany(mappedBy = "staffByStaffId")
+    public List<MedicineSaleEntity> getMedicineSalesById() {
+        return this.medicineSalesById;
+    }
+
+    public void setMedicineSalesById(List<MedicineSaleEntity> medicineSalesById) {
+        this.medicineSalesById = medicineSalesById;
     }
 
 }

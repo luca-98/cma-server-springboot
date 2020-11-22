@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface PrintFormRepositority extends JpaRepository<PrintFormEntity, UUID> {
 
-	List<PrintFormEntity> findAll();
+	List<PrintFormEntity> findAllByOrderByPrintNameAsc();
 
 	@Query("from PrintFormEntity p where p.id = ?1")
 	PrintFormEntity findPrintFormById(UUID id);

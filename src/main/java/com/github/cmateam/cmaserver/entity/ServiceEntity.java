@@ -18,6 +18,7 @@ public class ServiceEntity extends BaseEntity {
     private GroupServiceEntity groupServiceByGroupServiceId;
     private StaffEntity staffByStaffId;
     private List<ServiceReportEntity> serviceReportsById;
+    private TemplateReportEntity templateReportEntity;
 
     @Basic
     @Column(name = "service_name")
@@ -107,4 +108,15 @@ public class ServiceEntity extends BaseEntity {
     public void setServiceReportsById(List<ServiceReportEntity> serviceReportsById) {
         this.serviceReportsById = serviceReportsById;
     }
+
+    @ManyToOne
+    @JoinColumn(name = "template_report_id", referencedColumnName = "id")
+    public TemplateReportEntity getTemplateReportEntity() {
+        return this.templateReportEntity;
+    }
+
+    public void setTemplateReportEntity(TemplateReportEntity templateReportEntity) {
+        this.templateReportEntity = templateReportEntity;
+    }
+
 }

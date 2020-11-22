@@ -3,9 +3,9 @@ package com.github.cmateam.cmaserver.dto;
 import java.util.List;
 
 public class AppointmentSearchDTO {
-	int pageIndex;
-	int pageSize;
-	int totalRecord;
+	private int pageIndex;
+	private int pageSize;
+	private int totalRecord;
 	List<AppointmentDTO> appointmentList;
 
 	public int getPageIndex() {

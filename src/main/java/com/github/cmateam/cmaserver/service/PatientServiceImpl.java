@@ -196,6 +196,7 @@ public class PatientServiceImpl {
 			patientEntity.setStatus(1);
 			patientEntity.setUpdatedAt(new Date());
 			patientEntity.setCreatedAt(new Date());
+			patientEntity.setDebt(0L);
 		}
 		patientEntity.setPatientName(patientName);
 		patientEntity.setPatientNameSearch(vNCharacterUtils.removeAccent(patientName).toLowerCase());
@@ -204,7 +205,9 @@ public class PatientServiceImpl {
 		patientEntity.setAddress(address);
 		patientEntity.setAddressSearch(vNCharacterUtils.removeAccent(address).toLowerCase());
 		patientEntity.setPhone(phone);
-		patientEntity.setDebt(debt);
+		if (debt != null) {
+			patientEntity.setDebt(debt);
+		}
 		return patientRepository.save(patientEntity);
 	}
 
@@ -564,52 +567,55 @@ public class PatientServiceImpl {
 		ServiceEntity clinicalExam = serviceRepository.findServiceClinicExam();
 		for (MedicalExaminationEntity m : listMedical) {
 			HistoryDTO h = new HistoryDTO();
-
-			if (m.getSummary() != null) {
-				h.setType(1);
-				h.setId(m.getId());
-				h.setCode(m.getMedicalExaminationCode());
-				h.setService(clinicalExam.getServiceName());
-				h.setQuanity(1);
-				h.setSummary(m.getSummary());
-				h.setMainDisease(m.getMainDisease());
-				h.setExtraDisease(m.getExtraDisease());
-				h.setStaff(convertToStaffDTO(m.getStaffByStaffId()));
-				h.setCreatedAt(m.getCreatedAt());
-				ret.add(h);
-			}
-			List<ServiceReportEntity> listServiceReport = m.getServiceReportsById();
-			if (listServiceReport != null) {
-				for (ServiceReportEntity sr : listServiceReport) {
-					h = new HistoryDTO();
-					h.setType(2);
-					h.setId(sr.getId());
+			if (m.getStatus() == 5 || m.getStatus() == 6) {
+				if (m.getSummary() != null) {
+					h.setType(1);
+					h.setId(m.getId());
 					h.setCode(m.getMedicalExaminationCode());
-					h.setService(sr.getServiceByServiceId().getServiceName());
+					h.setService(clinicalExam.getServiceName());
 					h.setQuanity(1);
-					h.setSummary(null);
-					h.setMainDisease(null);
-					h.setExtraDisease(null);
-					h.setStaff(convertToStaffDTO(sr.getStaffByStaffId()));
-					h.setCreatedAt(sr.getCreatedAt());
+					h.setSummary(m.getSummary());
+					h.setMainDisease(m.getMainDisease());
+					h.setExtraDisease(m.getExtraDisease());
+					h.setStaff(convertToStaffDTO(m.getStaffByStaffId()));
+					h.setCreatedAt(m.getCreatedAt());
 					ret.add(h);
 				}
-			}
-			List<PrescriptionEntity> listPres = m.getPrescriptionsById();
-			if (listPres != null) {
-				for (PrescriptionEntity pres: listPres) {
-					h = new HistoryDTO();
-					h.setType(33);
-					h.setId(pres.getId());
-					h.setCode(m.getMedicalExaminationCode());
-					h.setService("Kê đơn thuốc");
-					h.setQuanity(1);
-					h.setSummary(null);
-					h.setMainDisease(null);
-					h.setExtraDisease(null);
-					h.setStaff(convertToStaffDTO(pres.getStaffByStaffId()));
-					h.setCreatedAt(pres.getCreatedAt());
-					ret.add(h);
+				List<ServiceReportEntity> listServiceReport = m.getServiceReportsById();
+				if (listServiceReport != null) {
+					for (ServiceReportEntity sr : listServiceReport) {
+						if (sr.getStatus() == 4) {
+							h = new HistoryDTO();
+							h.setType(2);
+							h.setId(sr.getId());
+							h.setCode(m.getMedicalExaminationCode());
+							h.setService(sr.getServiceByServiceId().getServiceName());
+							h.setQuanity(1);
+							h.setSummary(null);
+							h.setMainDisease(null);
+							h.setExtraDisease(null);
+							h.setStaff(convertToStaffDTO(sr.getStaffByStaffId()));
+							h.setCreatedAt(sr.getCreatedAt());
+							ret.add(h);
+						}
+					}
+				}
+				List<PrescriptionEntity> listPres = m.getPrescriptionsById();
+				if (listPres != null) {
+					for (PrescriptionEntity pres : listPres) {
+						h = new HistoryDTO();
+						h.setType(33);
+						h.setId(pres.getId());
+						h.setCode(m.getMedicalExaminationCode());
+						h.setService("Kê đơn thuốc");
+						h.setQuanity(1);
+						h.setSummary(null);
+						h.setMainDisease(null);
+						h.setExtraDisease(null);
+						h.setStaff(convertToStaffDTO(pres.getStaffByStaffId()));
+						h.setCreatedAt(pres.getCreatedAt());
+						ret.add(h);
+					}
 				}
 			}
 		}

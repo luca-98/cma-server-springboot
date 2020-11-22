@@ -1,11 +1,13 @@
 package com.github.cmateam.cmaserver.dto;
 
+import java.util.List;
 import java.util.UUID;
 
 public class GroupServiceDTO {
 	private UUID id;
 	private String groupServiceName;
 	private String groupServiceCode;
+	private List<StaffDTO> staffId;
 
 	public String getGroupServiceName() {
 		return groupServiceName;
@@ -29,6 +31,14 @@ public class GroupServiceDTO {
 
 	public void setId(UUID id) {
 		this.id = id;
+	}
+
+	public List<StaffDTO> getStaffId() {
+		return staffId;
+	}
+
+	public void setStaffId(List<StaffDTO> staffId) {
+		this.staffId = staffId;
 	}
 
 }

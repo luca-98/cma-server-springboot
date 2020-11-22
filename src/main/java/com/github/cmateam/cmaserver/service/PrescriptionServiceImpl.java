@@ -63,6 +63,7 @@ public class PrescriptionServiceImpl {
 		prescriptionDetailDTO.setNoteDetail(pde.getNote());
 		prescriptionDetailDTO.setQuantity(pde.getQuantity());
 		prescriptionDetailDTO.setMedicineByMedicineId(medicineDTO);
+		prescriptionDetailDTO.setQuantityTaken(pde.getQuantityTaken());
 
 		return prescriptionDetailDTO;
 	}
@@ -79,16 +80,19 @@ public class PrescriptionServiceImpl {
 	}
 
 	public PrescriptionDTO convertDTO(PrescriptionEntity pe) {
-		MedicalExaminationEntity mee = pe.getMedicalExaminationByMedicalExaminationId();
-		MedicalExamDTO medto = medicalExamServiceImpl.convertEntityToDto(mee);
-
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yy");
 		PrescriptionDTO prescriptionDTO = new PrescriptionDTO();
-		prescriptionDTO.setId(pe.getId());
-		prescriptionDTO.setMedicalExaminationByMedicalExaminationId(medto);
-		prescriptionDTO.setNote(pe.getNote());
-		prescriptionDTO.setStaffByStaffId(medto.getStaff());
-		prescriptionDTO.setLstPrescriptionDetailDTO(getPrescriptionDetailByPrescriptionId(pe.getId()));
-
+		if (pe != null) {
+			MedicalExaminationEntity mee = pe.getMedicalExaminationByMedicalExaminationId();
+			MedicalExamDTO medto = medicalExamServiceImpl.convertEntityToDto(mee);
+			prescriptionDTO.setStaffByStaffId(medto.getStaff());
+			prescriptionDTO.setMedicalExaminationByMedicalExaminationId(medto);
+			String nameOfPrescription = "DT" + formatter.format(pe.getUpdatedAt());
+			prescriptionDTO.setNameOfPrescription(nameOfPrescription);
+			prescriptionDTO.setId(pe.getId());
+			prescriptionDTO.setNote(pe.getNote());
+			prescriptionDTO.setLstPrescriptionDetailDTO(getPrescriptionDetailByPrescriptionId(pe.getId()));
+		}
 		return prescriptionDTO;
 	}
 

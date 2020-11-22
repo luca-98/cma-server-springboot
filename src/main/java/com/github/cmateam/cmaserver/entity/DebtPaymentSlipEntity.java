@@ -12,6 +12,7 @@ public class DebtPaymentSlipEntity extends BaseEntity {
     private StaffEntity staffByStaffId;
     private PatientEntity patientByPatientId;
     private SupplierEntity supplierBySupplierId;
+    private VoucherTypeEntity voucherTypeByVoucherTypeId;
 
     @Basic
     @Column(name = "date")
@@ -72,4 +73,15 @@ public class DebtPaymentSlipEntity extends BaseEntity {
     public void setSupplierBySupplierId(SupplierEntity supplierBySupplierId) {
         this.supplierBySupplierId = supplierBySupplierId;
     }
+
+    @ManyToOne
+    @JoinColumn(name = "voucher_type_id", referencedColumnName = "id")
+    public VoucherTypeEntity getVoucherTypeByVoucherTypeId() {
+        return this.voucherTypeByVoucherTypeId;
+    }
+
+    public void setVoucherTypeByVoucherTypeId(VoucherTypeEntity voucherTypeByVoucherTypeId) {
+        this.voucherTypeByVoucherTypeId = voucherTypeByVoucherTypeId;
+    }
+
 }

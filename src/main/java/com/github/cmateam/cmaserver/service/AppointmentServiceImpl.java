@@ -122,7 +122,7 @@ public class AppointmentServiceImpl {
 		if (minute >= 52 && minute <= 59) {
 			minute = 0;
 			hours = hours + 1;
-			if(hours == 24) {
+			if (hours == 24) {
 				hours = 0;
 			}
 			return String.valueOf(hours) + ":" + String.valueOf(minute);
@@ -297,5 +297,29 @@ public class AppointmentServiceImpl {
 			ret.add(patientDTO);
 		}
 		return ret;
+	}
+
+	public AppointmentDTO editAppointmentCreated(UUID appointmentId, Date appointmentDate, UUID staffId,
+			String appointmentTime) {
+		appointmentTime = processAppointmentTime(appointmentTime);
+		AppointmentEntity appointmentEntity = appointmentRepository.getOne(appointmentId);
+		if (staffId != null) {
+			if (appointmentRepository.getAllDayOfExaminationByStaffId(staffId).contains(appointmentDate)) {
+				if (appointmentRepository.getAllTimeByStaffId(staffId).contains(appointmentTime)) {
+					AppointmentDTO adto = new AppointmentDTO();
+					adto.setTimeExist(true);
+					return adto;
+				} else {
+					appointmentEntity.setTime(appointmentTime);
+				}
+			}
+			StaffEntity staffEntity = staffRepository.getOne(staffId);
+			appointmentEntity.setStaffByStaffId(staffEntity);
+		}
+		appointmentEntity.setTime(appointmentTime);
+		appointmentEntity.setUpdatedAt(new Date());
+		appointmentEntity.setDayOfExamination(appointmentDate);
+		appointmentEntity = appointmentRepository.save(appointmentEntity);
+		return convertEntityToDTO(appointmentEntity);
 	}
 }

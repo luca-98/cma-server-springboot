@@ -1,5 +1,7 @@
 package com.github.cmateam.cmaserver.entity;
 
+import java.util.List;
+
 import javax.persistence.*;
 
 @Entity
@@ -7,8 +9,8 @@ import javax.persistence.*;
 public class TemplateReportEntity extends BaseEntity {
     private String templateName;
     private String htmlReport;
-    private StaffEntity staffByStaffId;
     private GroupTemplateReportEntity groupTemplateReportByGroupTemplateReportId;
+    private List<ServiceEntity> servicesById;
 
     @Basic
     @Column(name = "template_name")
@@ -31,16 +33,6 @@ public class TemplateReportEntity extends BaseEntity {
     }
 
     @ManyToOne
-    @JoinColumn(name = "staff_id", referencedColumnName = "id")
-    public StaffEntity getStaffByStaffId() {
-        return staffByStaffId;
-    }
-
-    public void setStaffByStaffId(StaffEntity staffByStaffId) {
-        this.staffByStaffId = staffByStaffId;
-    }
-
-    @ManyToOne
     @JoinColumn(name = "group_template_report_id", referencedColumnName = "id")
     public GroupTemplateReportEntity getGroupTemplateReportByGroupTemplateReportId() {
         return groupTemplateReportByGroupTemplateReportId;
@@ -50,4 +42,14 @@ public class TemplateReportEntity extends BaseEntity {
             GroupTemplateReportEntity groupTemplateReportByGroupTemplateReportId) {
         this.groupTemplateReportByGroupTemplateReportId = groupTemplateReportByGroupTemplateReportId;
     }
+
+    @OneToMany(mappedBy = "templateReportEntity")
+    public List<ServiceEntity> getServicesById() {
+        return this.servicesById;
+    }
+
+    public void setServicesById(List<ServiceEntity> servicesById) {
+        this.servicesById = servicesById;
+    }
+
 }

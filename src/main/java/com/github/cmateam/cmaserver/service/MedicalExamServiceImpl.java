@@ -261,16 +261,19 @@ public class MedicalExamServiceImpl {
 		InvoiceEntity invoiceEntity = invoiceRepository.findByMedicalExam(m.getId());
 		List<InvoiceDetailedEntity> listInvoiceDetailed = invoiceEntity.getInvoiceDetailedsById();
 		for (InvoiceDetailedEntity i : listInvoiceDetailed) {
-			if (i.getServiceByServiceId().getGroupServiceByGroupServiceId().getGroupServiceCode()
-					.equals("CLINICAL_EXAMINATION")) {
-				ret.setClinicalPrice(i.getAmount());
-				if (i.getAmount() == i.getAmountPaid()) {
-					ret.setPayingStatus(1);
-				} else {
-					ret.setPayingStatus(0);
+			if (i.getServiceByServiceId() != null) {
+				if (i.getServiceByServiceId().getGroupServiceByGroupServiceId().getGroupServiceCode()
+						.equals("CLINICAL_EXAMINATION")) {
+					ret.setClinicalPrice(i.getAmount());
+					if (i.getAmount() == i.getAmountPaid()) {
+						ret.setPayingStatus(1);
+					} else {
+						ret.setPayingStatus(0);
+					}
+					break;
 				}
-				break;
 			}
+
 		}
 
 		ret.setStatus(m.getStatus());
@@ -290,7 +293,7 @@ public class MedicalExamServiceImpl {
 		return ret;
 	}
 
-	private StaffDTO convertStaffEntityToDto(StaffEntity s) {
+	public StaffDTO convertStaffEntityToDto(StaffEntity s) {
 		StaffDTO ret = new StaffDTO();
 		if (s == null) {
 			return ret;

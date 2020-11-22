@@ -9,6 +9,7 @@ public class PrescriptionDTO {
 	private StaffDTO staffByStaffId;
 	private MedicalExamDTO medicalExaminationByMedicalExaminationId;
 	private List<PrescriptionDetailDTO> lstPrescriptionDetailDTO;
+	private String nameOfPrescription;
 
 	public String getNote() {
 		return note;
@@ -48,6 +49,14 @@ public class PrescriptionDTO {
 
 	public void setLstPrescriptionDetailDTO(List<PrescriptionDetailDTO> lstPrescriptionDetailDTO) {
 		this.lstPrescriptionDetailDTO = lstPrescriptionDetailDTO;
+	}
+
+	public String getNameOfPrescription() {
+		return nameOfPrescription;
+	}
+
+	public void setNameOfPrescription(String nameOfPrescription) {
+		this.nameOfPrescription = nameOfPrescription;
 	}
 
 }

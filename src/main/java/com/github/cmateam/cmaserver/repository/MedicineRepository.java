@@ -18,5 +18,8 @@ public interface MedicineRepository extends JpaRepository<MedicineEntity, UUID> 
 
 	@Query("select m from MedicineEntity m where m.medicineName like ?1")
 	MedicineEntity getMedicineByName(String medicineName);
+	
+	@Query("select m.medicineName from MedicineEntity m where m.medicineNameSearch like ?1")
+	List<String> getListMedicinByName(String medicineNameSearch);
 
 }

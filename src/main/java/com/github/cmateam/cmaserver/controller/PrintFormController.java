@@ -6,14 +6,17 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.cmateam.cmaserver.dto.PrintFormDTO;
+import com.github.cmateam.cmaserver.entity.PrintFormEntity;
 import com.github.cmateam.cmaserver.service.PrintFormServiceImpl;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
-@RequestMapping("/print")
+@RequestMapping("/print-form")
 public class PrintFormController {
 
 	private PrintFormServiceImpl printFormServiceImpl;
@@ -23,13 +26,18 @@ public class PrintFormController {
 		this.printFormServiceImpl = printFormServiceImpl;
 	}
 
-	@GetMapping("/get-all-print-form")
+	@GetMapping
 	public List<PrintFormDTO> getAllPrintForm() {
 		return printFormServiceImpl.getAllPrintForm();
 	}
 
-	@GetMapping("/get-print-form-by-id")
-	public PrintFormDTO findPrintFormById(@RequestParam("id") UUID id) {
+	@GetMapping(value = "{id}")
+	public PrintFormDTO findPrintFormById(@PathVariable UUID id) {
 		return printFormServiceImpl.findPrintFormById(id);
+	}
+
+	@PutMapping(value = "{id}")
+	public PrintFormEntity editFormReport(@PathVariable UUID id, @RequestBody PrintFormEntity entity) {
+		return printFormServiceImpl.update(entity);
 	}
 }

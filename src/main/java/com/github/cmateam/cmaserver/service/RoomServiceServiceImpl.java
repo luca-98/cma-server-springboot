@@ -88,7 +88,7 @@ public class RoomServiceServiceImpl {
 		return listRoomService;
 	}
 
-	private RoomServiceDTO convertEntityToDTO(RoomServiceEntity rs) {
+	public RoomServiceDTO convertEntityToDTO(RoomServiceEntity rs) {
 		RoomServiceDTO roomServiceDTO = new RoomServiceDTO();
 		roomServiceDTO.setId(rs.getId());
 		roomServiceDTO.setRoomName(rs.getRoomName());

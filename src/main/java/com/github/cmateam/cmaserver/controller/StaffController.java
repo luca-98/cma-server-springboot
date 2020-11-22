@@ -50,4 +50,10 @@ public class StaffController {
 	public List<StaffDTO> getAllStaffByGroupService(String groupServiceCode) {
 		return staffServiceImpl.getAllStaffByGroupServiceStatusActive(groupServiceCode);
 	}
+
+	@GetMapping("/get-list-group-service-code-by-staff")
+	public List<String> getGroupServiceCodeByStaff(Principal principal) {
+		String username = principal.getName();
+		return staffServiceImpl.getGroupServiceCodeByStaff(username);
+	}
 }

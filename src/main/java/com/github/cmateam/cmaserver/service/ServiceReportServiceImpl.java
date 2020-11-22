@@ -1,46 +1,31 @@
 package com.github.cmateam.cmaserver.service;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.github.cmateam.cmaserver.repository.InvoiceDetailedRepository;
-import com.github.cmateam.cmaserver.repository.InvoiceRepository;
-import com.github.cmateam.cmaserver.repository.MedicalExaminationRepository;
-import com.github.cmateam.cmaserver.repository.RoomServiceRepository;
+import com.github.cmateam.cmaserver.entity.ServiceReportEntity;
 import com.github.cmateam.cmaserver.repository.ServiceReportRepository;
-import com.github.cmateam.cmaserver.repository.ServiceRepository;
-import com.github.cmateam.cmaserver.repository.StaffRepository;
 
 @Service
 public class ServiceReportServiceImpl {
-	ServiceReportRepository serviceReportRepository;
-	PatientServiceImpl patientServiceImpl;
-	StaffServiceImpl staffServiceImpl;
-	ServiceRepository serviceRepository;
-	InvoiceRepository invoiceRepository;
-	InvoiceDetailedRepository invoiceDetailedRepository;
-	StaffRepository staffRepository;
-	RoomServiceRepository roomServiceRepository;
-	VNCharacterUtils vnCharacterUtils;
-	MedicalExaminationRepository medicalExaminationRepository;
+	private ServiceReportRepository serviceReportRepository;
 
 	@Autowired
-	public ServiceReportServiceImpl(ServiceReportRepository serviceReportRepository,
-			PatientServiceImpl patientServiceImpl, StaffServiceImpl staffServiceImpl,
-			ServiceRepository serviceRepository, InvoiceRepository invoiceRepository,
-			InvoiceDetailedRepository invoiceDetailedRepository, RoomServiceRepository roomServiceRepository,
-			MedicalExaminationRepository medicalExaminationRepository, StaffRepository staffRepository,
-			VNCharacterUtils vnCharacterUtils) {
+	public ServiceReportServiceImpl(ServiceReportRepository serviceReportRepository) {
 		this.serviceReportRepository = serviceReportRepository;
-		this.patientServiceImpl = patientServiceImpl;
-		this.staffServiceImpl = staffServiceImpl;
-		this.serviceRepository = serviceRepository;
-		this.invoiceRepository = invoiceRepository;
-		this.invoiceDetailedRepository = invoiceDetailedRepository;
-		this.roomServiceRepository = roomServiceRepository;
-		this.staffRepository = staffRepository;
-		this.vnCharacterUtils = vnCharacterUtils;
-		this.medicalExaminationRepository = medicalExaminationRepository;
+	}
+
+	public Boolean changeStatusServiceReport(UUID id, Integer status) {
+		ServiceReportEntity serviceReportEntity = serviceReportRepository.getOne(id);
+		serviceReportEntity.setStatus(status);
+		serviceReportEntity = serviceReportRepository.save(serviceReportEntity);
+		if (serviceReportEntity.getStatus() == status) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

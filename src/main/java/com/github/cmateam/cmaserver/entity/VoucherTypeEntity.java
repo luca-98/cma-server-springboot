@@ -9,6 +9,7 @@ public class VoucherTypeEntity extends BaseEntity {
     private String typeName;
     private List<PaymentVoucherEntity> paymentVouchersById;
     private List<ReceiptVoucherEntity> receiptVouchersById;
+    private List<DebtPaymentSlipEntity> debtPaymentSlipsById;
 
     @Basic
     @Column(name = "type_name")
@@ -37,4 +38,14 @@ public class VoucherTypeEntity extends BaseEntity {
     public void setReceiptVouchersById(List<ReceiptVoucherEntity> receiptVouchersById) {
         this.receiptVouchersById = receiptVouchersById;
     }
+
+    @OneToMany(mappedBy = "voucherTypeByVoucherTypeId")
+    public List<DebtPaymentSlipEntity> getDebtPaymentSlipsById() {
+        return this.debtPaymentSlipsById;
+    }
+
+    public void setDebtPaymentSlipsById(List<DebtPaymentSlipEntity> debtPaymentSlipsById) {
+        this.debtPaymentSlipsById = debtPaymentSlipsById;
+    }
+
 }

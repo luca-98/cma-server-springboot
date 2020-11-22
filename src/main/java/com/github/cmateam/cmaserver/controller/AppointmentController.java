@@ -13,6 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -82,6 +83,13 @@ public class AppointmentController {
 	@GetMapping("/search-by-code")
 	public List<PatientDTO> searchByPatientCode(@RequestParam("patientCode") String patientCode) {
 		return appointmentServiceImpl.searchByPatientCode(patientCode);
+	}
+
+	@PutMapping("/edit-appointment-created")
+	public AppointmentDTO editAppointmentCreated(@RequestParam("appointmentId") UUID appointmentId,
+			@RequestParam("appointmentDate") @DateTimeFormat(pattern = "dd/MM/yyyy") Date appointmentDate,
+			@RequestParam("staffId") UUID staffId, @RequestParam("appointmentTime") String appointmentTime) {
+		return appointmentServiceImpl.editAppointmentCreated(appointmentId, appointmentDate, staffId, appointmentTime);
 	}
 
 }

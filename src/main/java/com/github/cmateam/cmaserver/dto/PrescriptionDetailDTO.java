@@ -7,7 +7,8 @@ public class PrescriptionDetailDTO {
 	private Short quantity;
 	private String dosage;
 	private String noteDetail;
-	//private PrescriptionDTO prescriptionByPrescriptionId;
+	private Short quantityTaken;
+	// private PrescriptionDTO prescriptionByPrescriptionId;
 	private MedicineDTO medicineByMedicineId;
 
 	public UUID getId() {
@@ -56,6 +57,14 @@ public class PrescriptionDetailDTO {
 
 	public void setMedicineByMedicineId(MedicineDTO medicineByMedicineId) {
 		this.medicineByMedicineId = medicineByMedicineId;
+	}
+
+	public Short getQuantityTaken() {
+		return quantityTaken;
+	}
+
+	public void setQuantityTaken(Short quantityTaken) {
+		this.quantityTaken = quantityTaken;
 	}
 
 }

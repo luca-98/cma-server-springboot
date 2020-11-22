@@ -10,12 +10,12 @@ public class ReceiptSaveDTO {
 	private Long amountPaid;
 	private List<ReceiptDetailTableDTO> lstReceiptDetails;
 	private String supplierName;
-	private String supplierNameSearch;
 	private String address;
 	private String phone;
 	private String email;
 	private String accountNumber;
 	private Long debt;
+	private String username;
 
 	public UUID getSupplierId() {
 		return supplierId;
@@ -65,14 +65,6 @@ public class ReceiptSaveDTO {
 		this.supplierName = supplierName;
 	}
 
-	public String getSupplierNameSearch() {
-		return supplierNameSearch;
-	}
-
-	public void setSupplierNameSearch(String supplierNameSearch) {
-		this.supplierNameSearch = supplierNameSearch;
-	}
-
 	public String getAddress() {
 		return address;
 	}
@@ -111,6 +103,14 @@ public class ReceiptSaveDTO {
 
 	public void setDebt(Long debt) {
 		this.debt = debt;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 }
