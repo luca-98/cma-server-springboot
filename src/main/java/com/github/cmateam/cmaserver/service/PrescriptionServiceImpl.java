@@ -5,9 +5,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.github.cmateam.cmaserver.dto.MedicalExamDTO;
@@ -16,8 +19,10 @@ import com.github.cmateam.cmaserver.dto.PrescriptionDTO;
 import com.github.cmateam.cmaserver.dto.PrescriptionDetailDTO;
 import com.github.cmateam.cmaserver.dto.PrescriptionDetailTableDTO;
 import com.github.cmateam.cmaserver.dto.PrescriptionUpdateDTO;
+import com.github.cmateam.cmaserver.dto.ReportHtmlDTO;
 import com.github.cmateam.cmaserver.entity.MedicalExaminationEntity;
 import com.github.cmateam.cmaserver.entity.MedicineEntity;
+import com.github.cmateam.cmaserver.entity.PatientEntity;
 import com.github.cmateam.cmaserver.entity.PrescriptionDetailEntity;
 import com.github.cmateam.cmaserver.entity.PrescriptionEntity;
 import com.github.cmateam.cmaserver.repository.MedicalExaminationRepository;
@@ -101,7 +106,7 @@ public class PrescriptionServiceImpl {
 		return convertDTO(pe);
 	}
 
-	public Boolean updatePrescription(PrescriptionUpdateDTO prescriptionUpdateDTO) {
+	public UUID updatePrescription(PrescriptionUpdateDTO prescriptionUpdateDTO) {
 		MedicalExaminationEntity mee = medicalExaminationRepository.getOne(prescriptionUpdateDTO.getMedicalExamId());
 		PrescriptionEntity pe = null;
 		boolean isAddNew = true;
@@ -161,6 +166,26 @@ public class PrescriptionServiceImpl {
 			lstpde.add(pde);
 		}
 		lstpde = prescriptionDetailRepository.saveAll(lstpde);
+		return pe.getId();
+	}
+
+	public Boolean updateHtmlReport(UUID id, String htmlReport) {
+		PrescriptionEntity pe = prescriptionRepository.getOne(id);
+		pe.setPrintDataHtml(htmlReport);
+		prescriptionRepository.save(pe);
 		return true;
+	}
+
+	public ResponseEntity<?> getOne(UUID id) {
+		Optional<PrescriptionEntity> prescriptionOptional = prescriptionRepository.findById(id);
+		if (!prescriptionOptional.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		PrescriptionEntity prescriptionEntity = prescriptionOptional.get();
+		ReportHtmlDTO ret = new ReportHtmlDTO();
+		PatientEntity p = prescriptionEntity.getMedicalExaminationByMedicalExaminationId().getPatientByPatientId();
+		ret.setName(p.getPatientName() + " - Đơn thuốc");
+		ret.setHtmlReport(prescriptionEntity.getPrintDataHtml());
+		return ResponseEntity.status(HttpStatus.OK).body(ret);
 	}
 }

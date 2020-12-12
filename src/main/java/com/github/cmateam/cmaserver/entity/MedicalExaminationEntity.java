@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "medical_examination", schema = "cma", catalog = "postgres")
+@Table(name = "medical_examination")
 public class MedicalExaminationEntity extends BaseEntity {
     private String medicalExaminationCode;
     private String examinationReason;
@@ -20,6 +20,7 @@ public class MedicalExaminationEntity extends BaseEntity {
     private String mainDiseaseCode;
     private String extraDisease;
     private String extraDiseaseCode;
+    private String printDataHtml;
     private StaffEntity staffByStaffId;
     private PatientEntity patientByPatientId;
     private List<PrescriptionEntity> prescriptionsById;
@@ -165,6 +166,16 @@ public class MedicalExaminationEntity extends BaseEntity {
 
     public void setExtraDiseaseCode(String extraDiseaseCode) {
         this.extraDiseaseCode = extraDiseaseCode;
+    }
+
+    @Basic
+    @Column(name = "print_data_html")
+    public String getPrintDataHtml() {
+        return this.printDataHtml;
+    }
+
+    public void setPrintDataHtml(String printDataHtml) {
+        this.printDataHtml = printDataHtml;
     }
 
     @ManyToOne

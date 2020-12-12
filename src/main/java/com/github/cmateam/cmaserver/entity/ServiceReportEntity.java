@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "service_report", schema = "cma", catalog = "postgres")
+@Table(name = "service_report")
 public class ServiceReportEntity extends BaseEntity {
     private String result;
     private String htmlReport;

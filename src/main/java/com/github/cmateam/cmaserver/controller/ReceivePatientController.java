@@ -39,10 +39,11 @@ public class ReceivePatientController {
 			@RequestParam("clinicalExamPrice") String clinicalExamPrice,
 			@RequestParam("roomServiceId") UUID roomServiceId, @RequestParam("staffId") UUID staffId,
 			@RequestParam("debt") Long debt, @RequestParam("examinationReason") String examinationReason,
+			@RequestParam(value = "appointmentId", required = false) UUID appointmentId,
 			Principal principal) {
 		String username = principal.getName();
 		return receivePatientServiceImpl.receivePatient(patientCode, patientName, phone, dateOfBirth, gender, address,
-				ordinalNumber, clinicalExamPrice, roomServiceId, staffId, debt, examinationReason, username, staffId);
+				ordinalNumber, clinicalExamPrice, roomServiceId, staffId, debt, examinationReason, username, staffId, appointmentId);
 	}
 
 	@PutMapping("/update-receive")

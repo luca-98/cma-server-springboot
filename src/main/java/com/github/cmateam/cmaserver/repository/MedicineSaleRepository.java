@@ -18,32 +18,32 @@ public interface MedicineSaleRepository extends JpaRepository<MedicineSaleEntity
 	@Query("select p2 from PatientEntity p join p.medicalExaminationsById me join me.prescriptionsById p2 where p.id = ?1")
 	PrescriptionEntity getPrescriptionByPatientId(UUID patientId);
 
-	@Query("from MedicineSaleEntity ms where ms.status <> 0 order by ms.createdAt ASC")
+	@Query("from MedicineSaleEntity ms where ms.status <> 0 order by ms.createdAt DESC")
 	List<MedicineSaleEntity> getMedicineSalePagging(Pageable pageable);
 
 	@Query("select count(ms.id) from MedicineSaleEntity ms where ms.status <> 0")
 	Integer countAllMedicineSalePagging();
 
-	@Query("select msd from MedicineSaleDetailEntity msd where msd.medicineSaleByMedicineSaleId.id = ?1")
+	@Query("select msd from MedicineSaleDetailEntity msd where msd.medicineSaleByMedicineSaleId.id = ?1 order by msd.createdAt DESC")
 	List<MedicineSaleDetailEntity> getMedicineSaleDetailByMedicineSale(UUID medicineSaleDetailId);
 
-	@Query("select s from StaffEntity s join s.medicineSalesById ms where s.staffNameSearch like ?1")
+	@Query("select distinct s from StaffEntity s join s.medicineSalesById ms where s.staffNameSearch like ?1")
 	List<StaffEntity> autoSearchByNameSearchStaff(String staffNameSearch, Pageable top10);
 
-	@Query("select p2 from StaffEntity s join s.medicineSalesById ms join ms.patientByPatientId p2 where p2.patientNameSearch like ?1")
+	@Query("select distinct p2 from StaffEntity s join s.medicineSalesById ms join ms.patientByPatientId p2 where p2.patientNameSearch like ?1")
 	List<PatientEntity> autoSearchByNameSearchPatient(String patientNameSearch, Pageable top10);
 
-	@Query("select p2 from StaffEntity s join s.medicineSalesById ms join ms.patientByPatientId p2 where lower(p2.patientCode) like ?1")
+	@Query("select distinct p2 from StaffEntity s join s.medicineSalesById ms join ms.patientByPatientId p2 where lower(p2.patientCode) like ?1")
 	List<PatientEntity> autoSearchByPatientCode(String patientCode, Pageable top10);
 	
-	@Query("select ms from StaffEntity s join s.medicineSalesById ms join ms.patientByPatientId p2 where p2.patientNameSearch like ?1 and s.staffNameSearch like ?2 and lower(p2.patientCode) like ?3 order by ms.createdAt ASC")
+	@Query("select ms from StaffEntity s join s.medicineSalesById ms join ms.patientByPatientId p2 where p2.patientNameSearch like ?1 and s.staffNameSearch like ?2 and lower(p2.patientCode) like ?3 order by ms.createdAt DESC")
 	List<MedicineSaleEntity> searchAllMedicineSaleWithoutDate(String patientNameSearch, String staffNameSearch,String patientCode,
 			Pageable pageable);
 
 	@Query("select count(ms.id) from StaffEntity s join s.medicineSalesById ms join ms.patientByPatientId p2 where p2.patientNameSearch like ?1 and s.staffNameSearch like ?2 and lower(p2.patientCode) like ?3")
 	Integer countAllMedicineSaleWithoutDate(String patientNameSearch, String staffNameSearch,String patientCode);
 
-	@Query("select ms from StaffEntity s join s.medicineSalesById ms join ms.patientByPatientId p2 where p2.patientNameSearch like ?1 and s.staffNameSearch like ?2 and ms.status <> 0 and date_trunc('day', ms.createdAt) between ?3 and ?4 and lower(p2.patientCode) like ?5 order by ms.createdAt ASC")
+	@Query("select ms from StaffEntity s join s.medicineSalesById ms join ms.patientByPatientId p2 where p2.patientNameSearch like ?1 and s.staffNameSearch like ?2 and ms.status <> 0 and date_trunc('day', ms.createdAt) between ?3 and ?4 and lower(p2.patientCode) like ?5 order by ms.createdAt DESC")
 	List<MedicineSaleEntity> searchAllMedicineSaleWithDate(String patientNameSearch, String staffNameSearch,
 			Date startDate, Date endDate,String patientCode, Pageable pageable);
 

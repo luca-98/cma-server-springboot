@@ -22,21 +22,21 @@ public interface AppointmentRepository extends JpaRepository<AppointmentEntity, 
 	@Query("select count(a.id) from AppointmentEntity a")
 	Integer countAllAppointmentPagging();
 
-	@Query("select a from AppointmentEntity a join a.patientByPatientId p where p.patientCode like ?1 and p.patientNameSearch like ?2 and p.phone like ?3 order by a.createdAt ASC")
+	@Query("select a from AppointmentEntity a join a.patientByPatientId p where p.patientCode like ?1 and p.patientNameSearch like ?2 and p.phone like ?3 order by a.dayOfExamination ASC")
 	List<AppointmentEntity> searchAllByPatientWithoutDateAndStatus(String patientCode, String patientNameSearch,
 			String phone, Pageable pageable);
 
 	@Query("select count(a.id) from AppointmentEntity a join a.patientByPatientId p where p.patientCode like ?1 and p.patientNameSearch like ?2 and p.phone like ?3")
 	Integer countAllByPatientWithoutDateAndStatus(String patientCode, String patientNameSearch, String phone);
 
-	@Query("select a from AppointmentEntity a join a.patientByPatientId p where p.patientCode like ?1 and p.patientNameSearch like ?2 and p.phone like ?3 and a.status = ?4 order by a.createdAt ASC")
+	@Query("select a from AppointmentEntity a join a.patientByPatientId p where p.patientCode like ?1 and p.patientNameSearch like ?2 and p.phone like ?3 and a.status = ?4 order by a.dayOfExamination ASC")
 	List<AppointmentEntity> searchAllByPatientWithoutDate(String patientCode, String patientNameSearch, String phone,
 			Integer status, Pageable pageable);
 
 	@Query("select count(a.id) from AppointmentEntity a join a.patientByPatientId p where p.patientCode like ?1 and p.patientNameSearch like ?2 and p.phone like ?3 and a.status = ?4")
 	Integer countAllByPatientWithoutDate(String patientCode, String patientNameSearch, String phone, Integer status);
 
-	@Query("select a from AppointmentEntity a join a.patientByPatientId p where p.patientCode like ?1 and p.patientNameSearch like ?2 and p.phone like ?3 and a.dayOfExamination between ?4 and ?5 order by a.createdAt ASC")
+	@Query("select a from AppointmentEntity a join a.patientByPatientId p where p.patientCode like ?1 and p.patientNameSearch like ?2 and p.phone like ?3 and a.dayOfExamination between ?4 and ?5 order by a.dayOfExamination ASC")
 	List<AppointmentEntity> searchAllByPatientWithoutStatus(String patientCode, String patientNameSearch, String phone,
 			Date startDate, Date endDate, Pageable pageable);
 
@@ -44,7 +44,7 @@ public interface AppointmentRepository extends JpaRepository<AppointmentEntity, 
 	Integer countAllByPatientWithoutStatus(String patientCode, String patientNameSearch, String phone, Date startDate,
 			Date endDate);
 
-	@Query("select a from AppointmentEntity a join a.patientByPatientId p where p.patientCode like ?1 and p.patientNameSearch like ?2 and p.phone like ?3 and a.dayOfExamination between ?4 and ?5 and a.status = ?6")
+	@Query("select a from AppointmentEntity a join a.patientByPatientId p where p.patientCode like ?1 and p.patientNameSearch like ?2 and p.phone like ?3 and a.dayOfExamination between ?4 and ?5 and a.status = ?6 order by a.dayOfExamination ASC")
 	List<AppointmentEntity> searchAllByPatientFullSearch(String patientCode, String patientNameSearch, String phone,
 			Date startDate, Date endDate, Integer status, Pageable pageable);
 
@@ -52,7 +52,7 @@ public interface AppointmentRepository extends JpaRepository<AppointmentEntity, 
 	Integer countAllByPatientFullSearch(String patientCode, String patientNameSearch, String phone, Date startDate,
 			Date endDate, Integer status);
 
-	@Query("select a.time from AppointmentEntity a where a.staffByStaffId.id = ?1")
+	@Query("select distinct a.time from AppointmentEntity a where a.staffByStaffId.id = ?1")
 	List<String> getAllTimeByStaffId(UUID staffId);
 
 	@Query("select distinct a.dayOfExamination from AppointmentEntity a where a.staffByStaffId.id = ?1")
@@ -69,4 +69,13 @@ public interface AppointmentRepository extends JpaRepository<AppointmentEntity, 
 
 	@Query("select distinct p from AppointmentEntity a join a.patientByPatientId p where p.patientCode like ?1")
 	List<PatientEntity> findByCodeSearch(String patientCode, Pageable top10);
+	
+	@Query("select a from AppointmentEntity a WHERE date_trunc('day', a.dayOfExamination) < date_trunc('day', now())")
+	List<AppointmentEntity> deleteAllDayOfExamBeforeNow();
+
+	@Query("select a from AppointmentEntity a WHERE date_trunc('day', a.dayOfExamination) = date_trunc('day', now())")
+	List<AppointmentEntity> getAllToday();
+	
+	@Query("select a from AppointmentEntity a join a.patientByPatientId p where p.patientCode = ?1 and date_trunc('day', a.dayOfExamination) = ?2")
+	AppointmentEntity getAppointmentByPatientCodeAndDate(String patientCode, Date appointmentDate);
 }

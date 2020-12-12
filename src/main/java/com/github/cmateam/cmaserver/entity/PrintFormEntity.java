@@ -6,7 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "print_form", schema = "cma", catalog = "postgres")
+@Table(name = "print_form")
 public class PrintFormEntity extends BaseEntity {
 	private String printName;
 	private String printCode;

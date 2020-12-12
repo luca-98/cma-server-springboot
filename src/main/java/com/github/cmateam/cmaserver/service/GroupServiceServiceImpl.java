@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.github.cmateam.cmaserver.dto.GroupServiceAddEditDTO;
 import com.github.cmateam.cmaserver.dto.GroupServiceDTO;
 import com.github.cmateam.cmaserver.dto.StaffDTO;
+import com.github.cmateam.cmaserver.entity.AppUserEntity;
 import com.github.cmateam.cmaserver.entity.GroupServiceEntity;
 import com.github.cmateam.cmaserver.entity.StaffEntity;
 import com.github.cmateam.cmaserver.repository.GroupServiceRepository;
@@ -22,15 +23,12 @@ public class GroupServiceServiceImpl {
 	private GroupServiceRepository groupServiceRepository;
 	private MedicalExamServiceImpl medicalExamServiceImpl;
 	private StaffRepository staffRepository;
-	private VNCharacterUtils vNCharacterUtils;
 
 	@Autowired
 	public GroupServiceServiceImpl(GroupServiceRepository groupServiceRepository,
-			MedicalExamServiceImpl medicalExamServiceImpl, StaffRepository staffRepository,
-			VNCharacterUtils vNCharacterUtils) {
+			MedicalExamServiceImpl medicalExamServiceImpl, StaffRepository staffRepository) {
 		this.groupServiceRepository = groupServiceRepository;
 		this.medicalExamServiceImpl = medicalExamServiceImpl;
-		this.vNCharacterUtils = vNCharacterUtils;
 		this.staffRepository = staffRepository;
 	}
 
@@ -55,7 +53,18 @@ public class GroupServiceServiceImpl {
 			return groupServiceRepository
 					.findAllFollowStaffWithStatusActive(groupServiceRepository.getStaffIDByUsername(username));
 		}
+	}
 
+	public List<UUID> getAllGroupServiceByStaffStaffId(UUID id) {
+		StaffEntity staff = staffRepository.getOne(id);
+		AppUserEntity appUserEntity = staff.getAppUserByAppUserId();
+		String userGroup = groupServiceRepository.checkGroupUser(appUserEntity.getUserName());
+		if (userGroup.equalsIgnoreCase("ROLE_MANAGER")) {
+			return groupServiceRepository.findAllWithStatusActiveUuids();
+		} else {
+			return groupServiceRepository
+					.findAllFollowStaffWithStatusActive(groupServiceRepository.getStaffIDByUsername(appUserEntity.getUserName()));
+		}
 	}
 
 	public GroupServiceDTO getDetailGroupService(UUID groupServiceId) {
@@ -63,6 +72,9 @@ public class GroupServiceServiceImpl {
 		List<StaffEntity> lstStaffs = groupServiceEntity.getStaffsById();
 		List<StaffDTO> lstStaffsDto = new ArrayList<>();
 		for (StaffEntity se : lstStaffs) {
+			if (se.getStatus() != 1) {
+				continue;
+			}
 			lstStaffsDto.add(medicalExamServiceImpl.convertStaffEntityToDto(se));
 		}
 		GroupServiceDTO groupServiceDTO = new GroupServiceDTO();
@@ -74,15 +86,28 @@ public class GroupServiceServiceImpl {
 		return groupServiceDTO;
 	}
 
+	public Boolean isDuplicate(String groupServiceName) {
+		List<String> lstString = groupServiceRepository.getAllGroupServiceName();
+		for (int i = 0; i < lstString.size(); i++) {
+			if (lstString.get(i).equalsIgnoreCase(groupServiceName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public Boolean createNewGroupService(GroupServiceAddEditDTO groupServiceAddEditDTO) {
 		GroupServiceEntity groupServiceEntity = new GroupServiceEntity();
 		groupServiceEntity.setCreatedAt(new Date());
 		groupServiceEntity.setUpdatedAt(new Date());
 		groupServiceEntity.setStatus(1);
-		groupServiceEntity.setGroupServiceName(groupServiceAddEditDTO.getGroupServiceName().trim());
-		String groupServiceCode = vNCharacterUtils.removeAccent(groupServiceAddEditDTO.getGroupServiceName())
-				.toUpperCase().replace(" ", "_");
-		groupServiceEntity.setGroupServiceCode(groupServiceCode);
+		String groupDerviceName = groupServiceAddEditDTO.getGroupServiceName();
+		if (isDuplicate(groupDerviceName) == true) {
+			return false;
+		} else {
+			groupServiceEntity.setGroupServiceName(groupServiceAddEditDTO.getGroupServiceName().trim());
+			groupServiceEntity.setGroupServiceCode("OTHER");
+		}
 		List<StaffEntity> lstEntity = new ArrayList<>();
 		for (int i = 0; i < groupServiceAddEditDTO.getLststaff().size(); i++) {
 			lstEntity.add(staffRepository.getOne(groupServiceAddEditDTO.getLststaff().get(i)));
@@ -103,9 +128,7 @@ public class GroupServiceServiceImpl {
 		groupServiceEntity.setUpdatedAt(new Date());
 		groupServiceEntity.setStatus(1);
 		groupServiceEntity.setGroupServiceName(groupServiceAddEditDTO.getGroupServiceName().trim());
-		String groupServiceCode = vNCharacterUtils.removeAccent(groupServiceAddEditDTO.getGroupServiceName())
-				.toUpperCase().replace(" ", "_");
-		groupServiceEntity.setGroupServiceCode(groupServiceCode);
+		groupServiceEntity.setGroupServiceCode("OTHER");
 		List<StaffEntity> lstEntity = new ArrayList<>();
 		for (int i = 0; i < groupServiceAddEditDTO.getLststaff().size(); i++) {
 			lstEntity.add(staffRepository.getOne(groupServiceAddEditDTO.getLststaff().get(i)));

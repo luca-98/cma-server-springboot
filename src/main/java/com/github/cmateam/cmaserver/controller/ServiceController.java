@@ -35,7 +35,7 @@ public class ServiceController {
 		return serviceServiceImpl.findServiceClinicExam();
 	}
 
-	@GetMapping("get-all-service")
+	@GetMapping("/get-all-service")
 	public List<ServiceDTO> getAllService() {
 		return serviceServiceImpl.getAllService();
 	}
@@ -43,6 +43,12 @@ public class ServiceController {
 	@GetMapping("/get-all-service-by-group-service")
 	public List<ServiceDTO> getAllServiceByGroupServiceCode(@RequestParam("groupServiceCode") String groupServiceCode) {
 		return serviceServiceImpl.getAllServiceByGroup(groupServiceCode);
+	}
+
+	@GetMapping("/find-service-by-staff")
+	public List<ServiceDTO> getServiceByStaff(@RequestParam("serviceName") String serviceName, Principal principal) {
+		String username = principal.getName();
+		return serviceServiceImpl.findServiceByStaff(serviceName, username);
 	}
 
 	@GetMapping("/find-service-in-group-service")
@@ -56,7 +62,7 @@ public class ServiceController {
 		return serviceServiceImpl.searchByNameServiceAll(serviceName);
 	}
 
-	@GetMapping("get-all-service-pagging")
+	@GetMapping("/get-all-service-pagging")
 	public ResponseEntity<?> getAllService(@RequestParam("pageIndex") Integer pageIndex,
 			@RequestParam("pageSize") Integer pageSize) {
 		return serviceServiceImpl.getAllServicePagging(pageIndex, pageSize);
@@ -79,12 +85,12 @@ public class ServiceController {
 		return serviceServiceImpl.editService(serviceAddEditDTO);
 	}
 
-	@GetMapping("get-service-by-id")
+	@GetMapping("/get-service-by-id")
 	public ServiceTableDTO getServiceById(@RequestParam("serviceId") UUID serviceId) {
 		return serviceServiceImpl.getServiceById(serviceId);
 	}
 
-	@GetMapping("search-all-service-pagging")
+	@GetMapping("/search-all-service-pagging")
 	public ResponseEntity<?> searchServicePagging(@RequestParam("serviceName") String serviceName,
 			@RequestParam("groupServiceId") UUID groupServiceId, @RequestParam("pageIndex") Integer pageIndex,
 			@RequestParam("pageSize") Integer pageSize) {

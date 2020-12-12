@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 
 @Entity
-@Table(name = "room_service", schema = "cma", catalog = "postgres")
+@Table(name = "room_service")
 public class RoomServiceEntity extends BaseEntity {
     private String roomName;
     private String unitName;
@@ -67,8 +67,7 @@ public class RoomServiceEntity extends BaseEntity {
     }
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "service_room_service", joinColumns = @JoinColumn(name = "room_service_id", referencedColumnName = "id", nullable = false), inverseJoinColumns = @JoinColumn(name = "service_id", referencedColumnName = "id", nullable = false))
+    @ManyToMany(mappedBy = "roomServicesById")
     public List<ServiceEntity> getServicesByServiceId() {
         return servicesByServiceId;
     }

@@ -189,4 +189,14 @@ public class ReceiptServiceImpl {
 		return autoSearchMedicine;
 	}
 
+	public List<String> searchAutoNameUnitName(String unitName) {
+		unitName = '%' + unitName.toLowerCase() + '%';
+		List<String> autoSearchUnitNameMedicine = medicineRepository.getListMedicinByUnitName(unitName);
+		List<String> autoSearchUnitNameMaterial = materialRepository.getListMaterialByUnitName(unitName);
+		for (int i = 0; i < autoSearchUnitNameMaterial.size(); i++) {
+			autoSearchUnitNameMedicine.add(autoSearchUnitNameMaterial.get(i));
+		}
+		return autoSearchUnitNameMedicine;
+	}
+
 }

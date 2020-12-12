@@ -2,9 +2,11 @@ package com.github.cmateam.cmaserver.controller;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,5 +43,10 @@ public class RoomServiceController {
 	@GetMapping("/get-list-room-service-by-group-service")
 	public List<RoomServiceDTO> getAllRoomServiceByGroupService(String groupServiceCode) {
 		return roomServiceServiceImpl.getAllRoomServiceByGroupService(groupServiceCode);
+	}
+
+	@GetMapping(value = "get-current-room-by-staff/{id}")
+	public UUID getCurrentRoomByStaff(@PathVariable UUID id) {
+		return roomServiceServiceImpl.getCurrentRoomByStaff(id);
 	}
 }

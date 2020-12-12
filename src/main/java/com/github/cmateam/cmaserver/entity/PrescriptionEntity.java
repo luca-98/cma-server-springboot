@@ -4,9 +4,10 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "prescription", schema = "cma", catalog = "postgres")
+@Table(name = "prescription")
 public class PrescriptionEntity extends BaseEntity {
     private String note;
+    private String printDataHtml;
     private List<MedicineSaleEntity> medicineSalesById;
     private StaffEntity staffByStaffId;
     private MedicalExaminationEntity medicalExaminationByMedicalExaminationId;
@@ -20,6 +21,16 @@ public class PrescriptionEntity extends BaseEntity {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    @Basic
+    @Column(name = "print_data_html")
+    public String getPrintDataHtml() {
+        return this.printDataHtml;
+    }
+
+    public void setPrintDataHtml(String printDataHtml) {
+        this.printDataHtml = printDataHtml;
     }
 
     @OneToMany(mappedBy = "prescriptionByPrescriptionId")

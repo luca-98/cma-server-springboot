@@ -34,8 +34,8 @@ public class SubclinicalController {
     }
 
     @GetMapping(value = "/get-staff-min-service")
-    public StaffDTO getStaffMinByService(@RequestParam UUID serviceId) {
-        return subclinicalServiceImpl.getStaffMinByService(serviceId);
+    public StaffDTO getStaffMinByService(@RequestParam String groupServiceCode) {
+        return subclinicalServiceImpl.getStaffMinByService(groupServiceCode);
     }
 
     @GetMapping("get-init-info-appoint")

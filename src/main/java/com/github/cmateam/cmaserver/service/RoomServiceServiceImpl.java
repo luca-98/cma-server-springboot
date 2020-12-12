@@ -12,17 +12,21 @@ import com.github.cmateam.cmaserver.entity.RoomServiceEntity;
 import com.github.cmateam.cmaserver.entity.ServiceEntity;
 import com.github.cmateam.cmaserver.entity.StaffEntity;
 import com.github.cmateam.cmaserver.repository.RoomServiceRepository;
+import com.github.cmateam.cmaserver.repository.StaffRepository;
 
 @Service
 public class RoomServiceServiceImpl {
 
 	private RoomServiceRepository roomServiceRepository;
 	private StaffServiceImpl staffServiceImpl;
+	private StaffRepository staffRepository;
 
 	@Autowired
-	public RoomServiceServiceImpl(RoomServiceRepository roomServiceRepository, StaffServiceImpl staffServiceImpl) {
+	public RoomServiceServiceImpl(RoomServiceRepository roomServiceRepository, StaffServiceImpl staffServiceImpl,
+			StaffRepository staffRepository) {
 		this.roomServiceRepository = roomServiceRepository;
 		this.staffServiceImpl = staffServiceImpl;
+		this.staffRepository = staffRepository;
 	}
 
 	public List<RoomServiceDTO> getAllRoomService() {
@@ -111,5 +115,15 @@ public class RoomServiceServiceImpl {
 			ret.add(convertEntityToDTO(rs));
 		}
 		return ret;
+	}
+
+	public UUID getCurrentRoomByStaff(UUID id) {
+		StaffEntity staff = staffRepository.getOne(id);
+		List<RoomServiceEntity> listRoom = staff.getRoomServicesById();
+		if (listRoom.size() == 0) {
+			return null;
+		} else {
+			return staff.getRoomServicesById().get(0).getId();
+		}
 	}
 }

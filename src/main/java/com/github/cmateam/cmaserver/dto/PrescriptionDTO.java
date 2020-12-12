@@ -10,6 +10,7 @@ public class PrescriptionDTO {
 	private MedicalExamDTO medicalExaminationByMedicalExaminationId;
 	private List<PrescriptionDetailDTO> lstPrescriptionDetailDTO;
 	private String nameOfPrescription;
+	private String printDataHtml;
 
 	public String getNote() {
 		return note;
@@ -57,6 +58,14 @@ public class PrescriptionDTO {
 
 	public void setNameOfPrescription(String nameOfPrescription) {
 		this.nameOfPrescription = nameOfPrescription;
+	}
+
+	public String getPrintDataHtml() {
+		return this.printDataHtml;
+	}
+
+	public void setPrintDataHtml(String printDataHtml) {
+		this.printDataHtml = printDataHtml;
 	}
 
 }

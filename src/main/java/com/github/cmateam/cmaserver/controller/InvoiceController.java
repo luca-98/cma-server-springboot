@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.cmateam.cmaserver.dto.InvoiceSaveDTO;
+import com.github.cmateam.cmaserver.dto.InvoiceSaveListDTO;
 import com.github.cmateam.cmaserver.dto.InvoiceShowDTO;
 import com.github.cmateam.cmaserver.dto.PatientDTO;
 import com.github.cmateam.cmaserver.service.InvoiceServiceImpl;
@@ -42,12 +42,12 @@ public class InvoiceController {
 	}
 
 	@GetMapping("/get-invoice-by-patientId")
-	public InvoiceShowDTO getInvoiceByPatientId(@RequestParam("patientId") UUID patientId) {
+	public List<InvoiceShowDTO> getInvoiceByPatientId(@RequestParam("patientId") UUID patientId) {
 		return invoiceServiceImpl.getInvoiceByPatientId(patientId);
 	}
 
 	@PostMapping("/update-invoice")
-	public Boolean updateInformationInvoice(@RequestBody InvoiceSaveDTO invoiceSaveDTO) {
-		return invoiceServiceImpl.updateInformationInvoice(invoiceSaveDTO);
+	public Boolean updateInformationInvoice(@RequestBody InvoiceSaveListDTO invoiceSaveListDTO) {
+		return invoiceServiceImpl.updateInformationInvoice(invoiceSaveListDTO);
 	}
 }

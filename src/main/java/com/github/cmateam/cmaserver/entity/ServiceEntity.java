@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 
 @Entity
-@Table(name = "service", schema = "cma", catalog = "postgres")
+@Table(name = "service")
 public class ServiceEntity extends BaseEntity {
     private String serviceName;
     private String serviceNameSearch;

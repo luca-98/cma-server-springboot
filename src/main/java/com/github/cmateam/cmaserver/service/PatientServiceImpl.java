@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -584,7 +585,7 @@ public class PatientServiceImpl {
 				List<ServiceReportEntity> listServiceReport = m.getServiceReportsById();
 				if (listServiceReport != null) {
 					for (ServiceReportEntity sr : listServiceReport) {
-						if (sr.getStatus() == 4) {
+						if (sr.getStatus() == 3) {
 							h = new HistoryDTO();
 							h.setType(2);
 							h.setId(sr.getId());
@@ -604,7 +605,7 @@ public class PatientServiceImpl {
 				if (listPres != null) {
 					for (PrescriptionEntity pres : listPres) {
 						h = new HistoryDTO();
-						h.setType(33);
+						h.setType(3);
 						h.setId(pres.getId());
 						h.setCode(m.getMedicalExaminationCode());
 						h.setService("Kê đơn thuốc");
@@ -620,6 +621,7 @@ public class PatientServiceImpl {
 			}
 		}
 		ret.sort(Comparator.comparing(o -> o.getCreatedAt()));
+		Collections.reverse(ret);
 		return ret;
 	}
 

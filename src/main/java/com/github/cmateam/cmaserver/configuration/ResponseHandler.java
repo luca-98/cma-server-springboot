@@ -37,6 +37,9 @@ public class ResponseHandler implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
             Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request,
             ServerHttpResponse response) {
+        if (!selectedContentType.getSubtype().equals("json")) {
+            return body;
+        }
         try {
             Map<?, ?> map = (Map<?, ?>) body;
             map.get("timestamp");

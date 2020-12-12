@@ -5,7 +5,7 @@ import java.util.List;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "template_report", schema = "cma", catalog = "postgres")
+@Table(name = "template_report")
 public class TemplateReportEntity extends BaseEntity {
     private String templateName;
     private String htmlReport;

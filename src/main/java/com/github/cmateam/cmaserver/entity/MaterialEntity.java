@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "material", schema = "cma", catalog = "postgres")
+@Table(name = "material")
 public class MaterialEntity extends BaseEntity {
     private String materialName;
     private String materialNameSearch;

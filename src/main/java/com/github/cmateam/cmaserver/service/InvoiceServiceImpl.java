@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.github.cmateam.cmaserver.dto.InvoiceDetailDTO;
-import com.github.cmateam.cmaserver.dto.InvoiceSaveDTO;
+import com.github.cmateam.cmaserver.dto.InvoiceSaveListDTO;
 import com.github.cmateam.cmaserver.dto.InvoiceShowDTO;
 import com.github.cmateam.cmaserver.dto.MedicineSaleDTO;
 import com.github.cmateam.cmaserver.dto.PatientDTO;
@@ -24,19 +24,22 @@ import com.github.cmateam.cmaserver.entity.PatientEntity;
 import com.github.cmateam.cmaserver.entity.ServiceEntity;
 import com.github.cmateam.cmaserver.repository.InvoiceDetailedRepository;
 import com.github.cmateam.cmaserver.repository.InvoiceRepository;
+import com.github.cmateam.cmaserver.repository.PatientRepository;
 
 @Service
 public class InvoiceServiceImpl {
 	private InvoiceRepository invoiceRepository;
 	private VNCharacterUtils vNCharacterUtils;
 	private InvoiceDetailedRepository invoiceDetailedRepository;
+	private PatientRepository patientRepository;
 
 	@Autowired
 	public InvoiceServiceImpl(InvoiceRepository invoiceRepository, VNCharacterUtils vNCharacterUtils,
-			InvoiceDetailedRepository invoiceDetailedRepository) {
+			InvoiceDetailedRepository invoiceDetailedRepository, PatientRepository patientRepository) {
 		this.invoiceRepository = invoiceRepository;
 		this.vNCharacterUtils = vNCharacterUtils;
 		this.invoiceDetailedRepository = invoiceDetailedRepository;
+		this.patientRepository = patientRepository;
 	}
 
 	public List<PatientDTO> searchByName(String name) {
@@ -159,37 +162,53 @@ public class InvoiceServiceImpl {
 		return invoiceShowDTO;
 	}
 
-	public InvoiceShowDTO getInvoiceByPatientId(UUID patientId) {
-		InvoiceEntity invoiceEntity = invoiceRepository.findByPatientIdInNowDay(patientId);
-		return convertInvoiceToDTO(invoiceEntity);
+	public List<InvoiceShowDTO> getInvoiceByPatientId(UUID patientId) {
+		List<InvoiceEntity> lstInvoiceEntity = invoiceRepository.findByPatientIdInNowDay(patientId);
+		List<InvoiceShowDTO> lstDto = new ArrayList<>();
+		for (InvoiceEntity ie : lstInvoiceEntity) {
+			lstDto.add(convertInvoiceToDTO(ie));
+		}
+		return lstDto;
 	}
 
-	public Boolean updateInformationInvoice(InvoiceSaveDTO invoiceSaveDTO) {
-		InvoiceEntity invoiceEntity = invoiceRepository.getOne(invoiceSaveDTO.getInvoiceId());
+	public Boolean updateInformationInvoice(InvoiceSaveListDTO invoiceSaveListDTO) {
+		List<InvoiceEntity> lstInvoiceEntities = new ArrayList<>();
+		for (int i = 0; i < invoiceSaveListDTO.getLstInvoidDetailListInvoiceSave().size(); i++) {
+			InvoiceEntity invoiceEntity = invoiceRepository
+					.getOne(invoiceSaveListDTO.getLstInvoidDetailListInvoiceSave().get(i).getInvoiceId());
+			invoiceEntity.setUpdatedAt(new Date());
+			invoiceEntity.setStatus(2);
+			invoiceEntity = invoiceRepository.save(invoiceEntity);
+			lstInvoiceEntities.add(invoiceEntity);
+			int sizeInvoiceDetail = invoiceSaveListDTO.getLstInvoidDetailListInvoiceSave().get(i)
+					.getLstInvoidDetailsSave().size();
+			for (int index = 0; index < sizeInvoiceDetail; index++) {
+				UUID invoiceDetailId = invoiceSaveListDTO.getLstInvoidDetailListInvoiceSave().get(i)
+						.getLstInvoidDetailsSave().get(index).getInvoiceDetailId();
+				if (invoiceDetailId != null) {
+					InvoiceDetailedEntity invoiceDetailedEntity = invoiceDetailedRepository.getOne(invoiceDetailId);
+					invoiceDetailedEntity.setAmount(invoiceSaveListDTO.getLstInvoidDetailListInvoiceSave().get(i)
+							.getLstInvoidDetailsSave().get(index).getAmountInvoiceDetail());
+					invoiceDetailedEntity.setAmountPaid(invoiceDetailedEntity.getAmountPaid()
+							+ invoiceSaveListDTO.getLstInvoidDetailListInvoiceSave().get(i).getLstInvoidDetailsSave()
+									.get(index).getAmountPaidInvoiceDetail());
+					invoiceDetailedEntity.setStatus(2);
+					invoiceDetailedEntity.setUpdatedAt(new Date());
+					invoiceDetailedEntity = invoiceDetailedRepository.save(invoiceDetailedEntity);
 
-		invoiceEntity.setUpdatedAt(new Date());
-		invoiceEntity.setStatus(2);
-		invoiceEntity = invoiceRepository.save(invoiceEntity);
+					InvoiceEntity invoice = invoiceDetailedEntity.getInvoiceByInvoiceId();
+					invoice.setAmountPaid(
+							invoice.getAmountPaid() + invoiceSaveListDTO.getLstInvoidDetailListInvoiceSave().get(i)
+									.getLstInvoidDetailsSave().get(index).getAmountPaidInvoiceDetail());
+					invoice = invoiceRepository.save(invoice);
 
-		for (int index = 0; index < invoiceSaveDTO.getLstInvoidDetailsSave().size(); index++) {
-			if (invoiceSaveDTO.getLstInvoidDetailsSave().get(index).getInvoiceDetailId() != null) {
-				InvoiceDetailedEntity invoiceDetailedEntity = invoiceDetailedRepository
-						.getOne(invoiceSaveDTO.getLstInvoidDetailsSave().get(index).getInvoiceDetailId());
-				invoiceDetailedEntity
-						.setAmount(invoiceSaveDTO.getLstInvoidDetailsSave().get(index).getAmountInvoiceDetail());
-				invoiceDetailedEntity.setAmountPaid(invoiceDetailedEntity.getAmountPaid()
-						+ invoiceSaveDTO.getLstInvoidDetailsSave().get(index).getAmountPaidInvoiceDetail());
-				invoiceDetailedEntity.setStatus(2);
-				invoiceDetailedEntity.setUpdatedAt(new Date());
-				invoiceDetailedEntity = invoiceDetailedRepository.save(invoiceDetailedEntity);
-
-				InvoiceEntity invoice = invoiceDetailedEntity.getInvoiceByInvoiceId();
-				invoice.setAmountPaid(invoice.getAmountPaid()
-						+ invoiceSaveDTO.getLstInvoidDetailsSave().get(index).getAmountPaidInvoiceDetail());
-				invoice = invoiceRepository.save(invoice);
+					PatientEntity patientEntity = invoice.getPatientByPatientId();
+					patientEntity.setDebt(invoice.getTotalAmount() - invoice.getAmountPaid());
+					patientEntity = patientRepository.save(patientEntity);
+				}
 			}
 		}
-		if (invoiceEntity == null) {
+		if (lstInvoiceEntities.isEmpty()) {
 			return false;
 		} else {
 			return true;

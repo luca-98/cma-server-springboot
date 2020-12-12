@@ -1,0 +1,1 @@
+alter table user_group drop constraint if exists user_group_user_group_code_key;

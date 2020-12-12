@@ -14,5 +14,8 @@ public interface MaterialRepository extends JpaRepository<MaterialEntity, UUID> 
 	
 	@Query("select m.materialName from MaterialEntity m where m.materialNameSearch like ?1")
 	List<String> getListMaterialByName(String materialNameSearch);
+	
+	@Query("select distinct m.unitName from MaterialEntity m where lower(m.unitName) like ?1")
+	List<String> getListMaterialByUnitName(String unitName);
 
 }

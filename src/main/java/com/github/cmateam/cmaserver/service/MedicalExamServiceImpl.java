@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.github.cmateam.cmaserver.dto.MedicalExamTableDTO;
@@ -12,6 +13,7 @@ import com.github.cmateam.cmaserver.dto.MedicalExamPaggingDTO;
 import com.github.cmateam.cmaserver.dto.PatientDTO;
 import com.github.cmateam.cmaserver.dto.RoomServiceDTO;
 import com.github.cmateam.cmaserver.dto.StaffDTO;
+import com.github.cmateam.cmaserver.dto.ReportHtmlDTO;
 import com.github.cmateam.cmaserver.entity.CountIdEntity;
 import com.github.cmateam.cmaserver.entity.InvoiceDetailedEntity;
 import com.github.cmateam.cmaserver.entity.InvoiceEntity;
@@ -28,11 +30,14 @@ import com.github.cmateam.cmaserver.repository.MedicalExaminationRepository;
 import com.github.cmateam.cmaserver.repository.OrdinalNumberRepository;
 import com.github.cmateam.cmaserver.repository.PatientRepository;
 import com.github.cmateam.cmaserver.repository.ReceivePatientRepository;
+import com.github.cmateam.cmaserver.repository.RoomServiceRepository;
 import com.github.cmateam.cmaserver.repository.ServiceRepository;
 import com.github.cmateam.cmaserver.repository.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -51,6 +56,7 @@ public class MedicalExamServiceImpl {
 	private PatientServiceImpl patientServiceImpl;
 	private StaffServiceImpl staffServiceImpl;
 	private ServiceRepository serviceRepository;
+	private RoomServiceRepository roomServiceRepository;
 
 	@Autowired
 	public MedicalExamServiceImpl(MedicalExaminationRepository medicalExaminationRepository,
@@ -59,7 +65,8 @@ public class MedicalExamServiceImpl {
 			ReceivePatientRepository receivePatientRepository, ReceivePatientServiceImpl receivePatientServiceImpl,
 			WebSocketService webSocketService, CountIdRepository countIdRepository,
 			InvoiceDetailedRepository invoiceDetailedRepository, PatientServiceImpl patientServiceImpl,
-			StaffServiceImpl staffServiceImpl, ServiceRepository serviceRepository) {
+			StaffServiceImpl staffServiceImpl, ServiceRepository serviceRepository,
+			RoomServiceRepository roomServiceRepository) {
 		this.medicalExaminationRepository = medicalExaminationRepository;
 		this.odinalNumberRepository = odinalNumberRepository;
 		this.patientRepository = patientRepository;
@@ -73,6 +80,7 @@ public class MedicalExamServiceImpl {
 		this.patientServiceImpl = patientServiceImpl;
 		this.staffServiceImpl = staffServiceImpl;
 		this.serviceRepository = serviceRepository;
+		this.roomServiceRepository = roomServiceRepository;
 	}
 
 	public MedicalExamPaggingDTO getListMedicalExam(Date fromDate, Date toDate, UUID roomId, UUID doctorId,
@@ -209,13 +217,37 @@ public class MedicalExamServiceImpl {
 	public Boolean changeStatus(UUID id, Integer status) {
 		MedicalExaminationEntity m = medicalExaminationRepository.getOne(id);
 		m.setStatus(status);
-		medicalExaminationRepository.save(m);
+		m = medicalExaminationRepository.save(m);
+		List<RoomServiceEntity> lroom = m.getStaffByStaffId().getRoomServicesById();
+		if (lroom.size() != 0) {
+			RoomServiceEntity room = lroom.get(0);
+			if (status == 5 || status == 0) {
+				Short receive = room.getTotalReceive();
+				if (--receive >= 0) {
+					room.setTotalReceive(receive);
+				}
+				Short totalDone = room.getTotalDone();
+				room.setTotalDone(++totalDone);
+				roomServiceRepository.save(room);
+				RoomServiceDTO roomServiceDTO = new RoomServiceDTO();
+				roomServiceDTO.setId(room.getId());
+				roomServiceDTO.setRoomName(room.getRoomName());
+				roomServiceDTO.setUnitName(room.getUnitName());
+				roomServiceDTO.setTotalReceive(room.getTotalReceive());
+				roomServiceDTO.setTotalDone(room.getTotalDone());
+				webSocketService.updateRoomService(roomServiceDTO);
+			}
+		}
 		List<ReceivePatientEntity> listReceive = m.getReceivePatientsById();
-		if (listReceive.size() != 0) {
+		if (listReceive.size() != 0 && status != 3 && status != 4) {
 			ReceivePatientEntity r = listReceive.get(0);
-			r.setStatus(status);
-			webSocketService.updateReceivePatient(receivePatientServiceImpl.convertEntityToDTO(r));
+			if (status ==5) {
+				r.setStatus(3);
+			} else {
+				r.setStatus(status);
+			}
 			receivePatientRepository.save(r);
+			webSocketService.updateReceivePatient(receivePatientServiceImpl.convertEntityToDTO(r));
 		}
 		return true;
 	}
@@ -248,6 +280,7 @@ public class MedicalExamServiceImpl {
 		ret.setMainDiseaseCode(m.getMainDiseaseCode());
 		ret.setExtraDisease(m.getExtraDisease());
 		ret.setExtraDiseaseCode(m.getExtraDiseaseCode());
+		ret.setPrintDataHtml(m.getPrintDataHtml());
 
 		StaffEntity staff = m.getStaffByStaffId();
 		ret.setStaff(convertStaffEntityToDto(staff));
@@ -265,7 +298,7 @@ public class MedicalExamServiceImpl {
 				if (i.getServiceByServiceId().getGroupServiceByGroupServiceId().getGroupServiceCode()
 						.equals("CLINICAL_EXAMINATION")) {
 					ret.setClinicalPrice(i.getAmount());
-					if (i.getAmount() == i.getAmountPaid()) {
+					if (i.getAmount().equals(i.getAmountPaid())) {
 						ret.setPayingStatus(1);
 					} else {
 						ret.setPayingStatus(0);
@@ -295,7 +328,7 @@ public class MedicalExamServiceImpl {
 
 	public StaffDTO convertStaffEntityToDto(StaffEntity s) {
 		StaffDTO ret = new StaffDTO();
-		if (s == null) {
+		if (s == null || s.getStatus() != 1) {
 			return ret;
 		}
 		ret.setId(s.getId());
@@ -355,6 +388,20 @@ public class MedicalExamServiceImpl {
 			mee.setStatus(2);
 			mee.setCreatedAt(new Date());
 			mee.setUpdatedAt(new Date());
+			List<RoomServiceEntity> lroom = staffEntity.getRoomServicesById();
+			if (lroom.size() != 0) {
+				RoomServiceEntity room = lroom.get(0);
+				Short receive = room.getTotalReceive();
+				room.setTotalReceive(++receive);
+				roomServiceRepository.save(room);
+				RoomServiceDTO roomServiceDTO = new RoomServiceDTO();
+				roomServiceDTO.setId(room.getId());
+				roomServiceDTO.setRoomName(room.getRoomName());
+				roomServiceDTO.setUnitName(room.getUnitName());
+				roomServiceDTO.setTotalReceive(room.getTotalReceive());
+				roomServiceDTO.setTotalDone(room.getTotalDone());
+				webSocketService.updateRoomService(roomServiceDTO);
+			}
 		} else {
 			mee.setUpdatedAt(new Date());
 		}
@@ -403,5 +450,27 @@ public class MedicalExamServiceImpl {
 		}
 
 		return convertEntityToDto(mee);
+	}
+
+	public Boolean updateHtmlReport(UUID id, String htmlReport) {
+		MedicalExaminationEntity medicalExaminationEntity = medicalExaminationRepository.getOne(id);
+		if (medicalExaminationEntity != null) {
+			medicalExaminationEntity.setPrintDataHtml(htmlReport);
+			medicalExaminationRepository.save(medicalExaminationEntity);
+		}
+		return true;
+	}
+
+	public ResponseEntity<?> getOneMedicalExam(UUID id) {
+		Optional<MedicalExaminationEntity> medicalExaminationOptional = medicalExaminationRepository.findById(id);
+		if (!medicalExaminationOptional.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		MedicalExaminationEntity medicalExaminationEntity = medicalExaminationOptional.get();
+		ReportHtmlDTO ret = new ReportHtmlDTO();
+		PatientEntity p = medicalExaminationEntity.getPatientByPatientId();
+		ret.setName(p.getPatientName() + " - Phiếu khám lâm sàng");
+		ret.setHtmlReport(medicalExaminationEntity.getPrintDataHtml());
+		return ResponseEntity.status(HttpStatus.OK).body(ret);
 	}
 }

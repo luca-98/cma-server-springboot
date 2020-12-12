@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "group_service", schema = "cma", catalog = "postgres")
+@Table(name = "group_service")
 public class GroupServiceEntity extends BaseEntity {
     private String groupServiceName;
     private String groupServiceCode;

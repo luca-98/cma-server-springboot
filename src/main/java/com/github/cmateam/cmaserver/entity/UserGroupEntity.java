@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 
 @Entity
-@Table(name = "user_group", schema = "cma", catalog = "postgres")
+@Table(name = "user_group")
 public class UserGroupEntity extends BaseEntity {
     private String userGroupCode;
     private String userGroupName;

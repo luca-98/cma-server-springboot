@@ -13,7 +13,7 @@ public interface PrescriptionRepository extends JpaRepository<PrescriptionEntity
 	@Query("select p2 from PatientEntity p join p.medicalExaminationsById me join me.prescriptionsById p2 where me.id = ?1")
 	PrescriptionEntity getPrescriptionByMedicalId(UUID medicalId);
 
-	@Query("select p from PrescriptionEntity p join p.medicalExaminationByMedicalExaminationId me join me.patientByPatientId p2 where p2.id = ?1 order by p2.updatedAt DESC")
+	@Query("select p from PrescriptionEntity p join p.medicalExaminationByMedicalExaminationId me join me.patientByPatientId p2 where p2.id = ?1 order by p.updatedAt DESC")
 	List<PrescriptionEntity> getPrescriptionByPatientId(UUID patientId);
 
 }

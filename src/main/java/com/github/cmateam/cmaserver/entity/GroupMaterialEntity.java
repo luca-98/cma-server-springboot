@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "group_material", schema = "cma", catalog = "postgres")
+@Table(name = "group_material")
 public class GroupMaterialEntity extends BaseEntity {
     private String groupMaterialName;
     private List<MaterialEntity> materialsById;

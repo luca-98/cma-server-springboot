@@ -1,6 +1,7 @@
 package com.github.cmateam.cmaserver.dto;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class DebtPaymentSlipDTO {
@@ -9,8 +10,13 @@ public class DebtPaymentSlipDTO {
 	private Long debtPaymentAmount;
 	private String debtPaymentNote;
 	private PatientDTO patient;
+	private SupplierDTO supplier;
 	private StaffDTO staff;
 	private String nameOfVoucherType;
+	private Long voucherNumber;
+	private List<ChangeDetailDebtDTO> lstChangeDetailDebtDTO;
+	private List<InvoiceDetailShowDebtAfterDTO> lstInvoiceDetailShowDebtAfters;
+	private List<ReceiptShowDebtAfterDTO> lstReceiptShowDebtAfters;
 
 	public UUID getDebtPaymentId() {
 		return debtPaymentId;
@@ -66,6 +72,46 @@ public class DebtPaymentSlipDTO {
 
 	public void setNameOfVoucherType(String nameOfVoucherType) {
 		this.nameOfVoucherType = nameOfVoucherType;
+	}
+
+	public SupplierDTO getSupplier() {
+		return supplier;
+	}
+
+	public void setSupplier(SupplierDTO supplier) {
+		this.supplier = supplier;
+	}
+
+	public List<ChangeDetailDebtDTO> getLstChangeDetailDebtDTO() {
+		return lstChangeDetailDebtDTO;
+	}
+
+	public void setLstChangeDetailDebtDTO(List<ChangeDetailDebtDTO> lstChangeDetailDebtDTO) {
+		this.lstChangeDetailDebtDTO = lstChangeDetailDebtDTO;
+	}
+
+	public List<InvoiceDetailShowDebtAfterDTO> getLstInvoiceDetailShowDebtAfters() {
+		return lstInvoiceDetailShowDebtAfters;
+	}
+
+	public void setLstInvoiceDetailShowDebtAfters(List<InvoiceDetailShowDebtAfterDTO> lstInvoiceDetailShowDebtAfters) {
+		this.lstInvoiceDetailShowDebtAfters = lstInvoiceDetailShowDebtAfters;
+	}
+
+	public List<ReceiptShowDebtAfterDTO> getLstReceiptShowDebtAfters() {
+		return lstReceiptShowDebtAfters;
+	}
+
+	public void setLstReceiptShowDebtAfters(List<ReceiptShowDebtAfterDTO> lstReceiptShowDebtAfters) {
+		this.lstReceiptShowDebtAfters = lstReceiptShowDebtAfters;
+	}
+
+	public Long getVoucherNumber() {
+		return voucherNumber;
+	}
+
+	public void setVoucherNumber(Long voucherNumber) {
+		this.voucherNumber = voucherNumber;
 	}
 
 }

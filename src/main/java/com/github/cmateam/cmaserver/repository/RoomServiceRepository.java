@@ -18,6 +18,6 @@ public interface RoomServiceRepository extends JpaRepository<RoomServiceEntity, 
 	@Query("FROM RoomServiceEntity r JOIN r.servicesByServiceId s JOIN s.groupServiceByGroupServiceId g WHERE g.groupServiceCode='CLINICAL_EXAMINATION'")
 	List<RoomServiceEntity> findRoomServiceClinicalExam();
 
-	@Query("Select distinct r FROM RoomServiceEntity r JOIN r.servicesByServiceId s JOIN s.groupServiceByGroupServiceId g WHERE g.groupServiceCode= ?1")
+	@Query("SELECT distinct r FROM RoomServiceEntity r JOIN r.servicesByServiceId s JOIN s.groupServiceByGroupServiceId g WHERE g.groupServiceCode= ?1")
 	List<RoomServiceEntity> findRoomServiceByGroupService(String groupServiceCode);
 }

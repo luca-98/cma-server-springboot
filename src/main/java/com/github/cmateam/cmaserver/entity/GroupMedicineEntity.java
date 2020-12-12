@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "group_medicine", schema = "cma", catalog = "postgres")
+@Table(name = "group_medicine")
 public class GroupMedicineEntity extends BaseEntity {
     private String groupMedicineName;
     private List<MedicineEntity> medicinesById;

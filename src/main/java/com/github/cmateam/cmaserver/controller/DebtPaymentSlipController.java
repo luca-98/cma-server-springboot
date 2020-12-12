@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.cmateam.cmaserver.dto.DebtPaymentSlipSaveDTO;
+import com.github.cmateam.cmaserver.dto.DebtPaymentSlipSupplierSaveDTO;
 import com.github.cmateam.cmaserver.dto.PatientDTO;
+import com.github.cmateam.cmaserver.dto.SupplierDTO;
 import com.github.cmateam.cmaserver.service.DebtPaymentSlipServiceImpl;
 
 @RestController
@@ -60,10 +62,38 @@ public class DebtPaymentSlipController {
 		debtPaymentSlipSaveDTO.setUsername(principal.getName());
 		return debtPaymentSlipServiceImpl.saveDebtPaymentSlip(debtPaymentSlipSaveDTO);
 	}
-	
+
 	@GetMapping("/get-number-voucher")
-	public Integer getVoucherNumber() {
+	public Long getVoucherNumber() {
 		return debtPaymentSlipServiceImpl.getVoucherNumber();
+	}
+
+	@GetMapping("/get-all-receipt-debt-by-supplierId")
+	public ResponseEntity<?> getAllReceiptSupplierDebtByid(@RequestParam("supplierId") UUID supplierId,
+			@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
+		return debtPaymentSlipServiceImpl.getAllReceiptSupplierDebtByid(supplierId, pageIndex, pageSize);
+	}
+
+	@PostMapping("/save-debt-payment-slip-supplier")
+	public Boolean saveDebtPaymentSlipSupplier(
+			@RequestBody DebtPaymentSlipSupplierSaveDTO debtPaymentSlipSupplierSaveDTO, Principal principal) {
+		debtPaymentSlipSupplierSaveDTO.setUsername(principal.getName());
+		return debtPaymentSlipServiceImpl.saveDebtPaymentSlipSupplier(debtPaymentSlipSupplierSaveDTO);
+	}
+
+	@GetMapping("/search-by-name-supplier")
+	public List<SupplierDTO> searchByNameSupplier(@RequestParam("supplierNameSearch") String supplierNameSearch) {
+		return debtPaymentSlipServiceImpl.searchByNameSupplier(supplierNameSearch);
+	}
+
+	@GetMapping("/search-by-name-phone")
+	public List<SupplierDTO> searchByPhoneSupplier(@RequestParam("phone") String phone) {
+		return debtPaymentSlipServiceImpl.searchByPhoneSupplier(phone);
+	}
+
+	@GetMapping("/get-number-voucher-pay")
+	public Long getVoucherNumberPay() {
+		return debtPaymentSlipServiceImpl.getVoucherNumberPay();
 	}
 
 }

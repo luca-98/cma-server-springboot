@@ -200,9 +200,9 @@ create table if not exists appointment (
 	ordinal_number_id uuid unique,
 	patient_id uuid,
 	staff_id uuid,
-	constraint receive_patient_fk1 foreign key (ordinal_number_id) references ordinal_number (id),
-	constraint receive_patient_fk2 foreign key (patient_id) references patient (id),
-	constraint receive_patient_fk3 foreign key (staff_id) references staff (id)
+	constraint appointment_fk1 foreign key (ordinal_number_id) references ordinal_number (id),
+	constraint appointment_fk2 foreign key (patient_id) references patient (id),
+	constraint appointment_fk3 foreign key (staff_id) references staff (id)
 );
 create table if not exists group_material (
 	id uuid not null primary key,

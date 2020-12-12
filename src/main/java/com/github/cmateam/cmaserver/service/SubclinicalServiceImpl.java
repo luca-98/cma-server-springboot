@@ -16,18 +16,23 @@ import com.github.cmateam.cmaserver.dto.SubclinicalAppointDTO;
 import com.github.cmateam.cmaserver.dto.SubclinicalManage;
 import com.github.cmateam.cmaserver.dto.SubclinicalPaggingDTO;
 import com.github.cmateam.cmaserver.entity.CountIdEntity;
+import com.github.cmateam.cmaserver.entity.GroupServiceEntity;
+import com.github.cmateam.cmaserver.entity.ImageEntity;
 import com.github.cmateam.cmaserver.entity.InvoiceDetailedEntity;
 import com.github.cmateam.cmaserver.entity.InvoiceEntity;
 import com.github.cmateam.cmaserver.entity.MedicalExaminationEntity;
 import com.github.cmateam.cmaserver.entity.PatientEntity;
+import com.github.cmateam.cmaserver.entity.RoomServiceEntity;
 import com.github.cmateam.cmaserver.entity.ServiceEntity;
 import com.github.cmateam.cmaserver.entity.ServiceReportEntity;
 import com.github.cmateam.cmaserver.entity.StaffEntity;
 import com.github.cmateam.cmaserver.repository.CountIdRepository;
+import com.github.cmateam.cmaserver.repository.ImageRepository;
 import com.github.cmateam.cmaserver.repository.InvoiceDetailedRepository;
 import com.github.cmateam.cmaserver.repository.InvoiceRepository;
 import com.github.cmateam.cmaserver.repository.MedicalExaminationRepository;
 import com.github.cmateam.cmaserver.repository.PatientRepository;
+import com.github.cmateam.cmaserver.repository.RoomServiceRepository;
 import com.github.cmateam.cmaserver.repository.ServiceReportRepository;
 import com.github.cmateam.cmaserver.repository.ServiceRepository;
 import com.github.cmateam.cmaserver.repository.StaffRepository;
@@ -53,14 +58,16 @@ public class SubclinicalServiceImpl {
     private CountIdRepository countIdRepository;
     private StaffServiceImpl staffServiceImpl;
     private InvoiceRepository invoiceRepository;
+    private RoomServiceRepository roomServiceRepository;
+    private ImageRepository imageRepository;
 
     @Autowired
     public SubclinicalServiceImpl(StaffRepository staffRepository, ServiceReportRepository serviceReportRepository,
             MedicalExaminationRepository medicalExaminationRepository, PatientRepository patientRepository,
             InvoiceDetailedRepository invoiceDetailedRepository, ServiceRepository serviceRepository,
             PatientServiceImpl patientServiceImpl, VNCharacterUtils vNCharacterUtils,
-            CountIdRepository countIdRepository, StaffServiceImpl staffServiceImpl,
-            InvoiceRepository invoiceRepository) {
+            CountIdRepository countIdRepository, StaffServiceImpl staffServiceImpl, InvoiceRepository invoiceRepository,
+            RoomServiceRepository roomServiceRepository, ImageRepository imageRepository) {
         this.staffRepository = staffRepository;
         this.serviceReportRepository = serviceReportRepository;
         this.medicalExaminationRepository = medicalExaminationRepository;
@@ -72,10 +79,37 @@ public class SubclinicalServiceImpl {
         this.countIdRepository = countIdRepository;
         this.invoiceRepository = invoiceRepository;
         this.staffServiceImpl = staffServiceImpl;
+        this.roomServiceRepository = roomServiceRepository;
+        this.imageRepository = imageRepository;
     }
 
-    public StaffDTO getStaffMinByService(UUID serviceId) {
-        List<StaffEntity> listStaffWithService = staffRepository.getAllStaffByService(serviceId);
+    public StaffDTO getStaffMinByService(String groupServiceCode) {
+        List<StaffEntity> listStaffWithService = new ArrayList<>();
+        List<RoomServiceEntity> listRoom = roomServiceRepository.findRoomServiceByGroupService(groupServiceCode);
+        for (RoomServiceEntity r : listRoom) {
+            for (StaffEntity se : r.getStaffsByStaffId()) {
+                List<GroupServiceEntity> listGroup = se.getGroupServicesById();
+                boolean haveGroup = false;
+                for (GroupServiceEntity g : listGroup) {
+                    if (g.getGroupServiceCode().equals(groupServiceCode)) {
+                        haveGroup = true;
+                    }
+                }
+                if (!haveGroup) {
+                    continue;
+                }
+                boolean have = false;
+                for (StaffEntity s : listStaffWithService) {
+                    if (s.getId().equals(se.getId())) {
+                        have = true;
+                        break;
+                    }
+                }
+                if (!have) {
+                    listStaffWithService.add(se);
+                }
+            }
+        }
         if (listStaffWithService.size() == 0) {
             return new StaffDTO();
         }
@@ -166,7 +200,7 @@ public class SubclinicalServiceImpl {
         for (ServiceReportEntity old : listServiceReport) {
             boolean isExist = false;
             for (SubclinicalAppointDTO appoint : listAppoint) {
-                if (appoint.getServiceId().equals(old.getId())) {
+                if (appoint.getServiceId().equals(old.getServiceByServiceId().getId())) {
                     isExist = true;
                 }
             }
@@ -187,7 +221,7 @@ public class SubclinicalServiceImpl {
         for (SubclinicalAppointDTO appoint : listAppoint) {
             boolean isExist = false;
             for (ServiceReportEntity old : listServiceReport) {
-                if (appoint.getServiceId().equals(old.getId())) {
+                if (appoint.getServiceId().equals(old.getServiceByServiceId().getId())) {
                     isExist = true;
                 }
             }
@@ -289,7 +323,7 @@ public class SubclinicalServiceImpl {
         for (ServiceReportEntity old : listServiceReport) {
             boolean isExist = false;
             for (SubclinicalAppointDTO appoint : listAppoint) {
-                if (appoint.getServiceId().equals(old.getId())) {
+                if (appoint.getServiceId().equals(old.getServiceByServiceId().getId())) {
                     isExist = true;
                 }
             }
@@ -303,6 +337,11 @@ public class SubclinicalServiceImpl {
                         break;
                     }
                 }
+                List<ImageEntity> listImage = old.getImagesById();
+                for (ImageEntity i : listImage) {
+                    imageRepository.delete(i);
+                }
+                old = serviceReportRepository.getOne(old.getId());
                 serviceReportRepository.delete(old);
             }
         }
@@ -310,21 +349,23 @@ public class SubclinicalServiceImpl {
         for (SubclinicalAppointDTO appoint : listAppoint) {
             boolean isExist = false;
             for (ServiceReportEntity old : listServiceReport) {
-                if (appoint.getServiceId().equals(old.getId())) {
+                if (appoint.getServiceId().equals(old.getServiceByServiceId().getId())) {
                     old.setResult(appoint.getSummary());
                     old.setNote(appoint.getNote());
+                    old.setHtmlReport(appoint.getHtmlReport());
+                    old.setUpdatedAt(new Date());
                     serviceReportRepository.save(old);
                     isExist = true;
                 }
             }
             if (!isExist) {
                 ServiceEntity serviceEntity = serviceRepository.getOne(appoint.getServiceId());
-                StaffEntity staff = staffRepository.getOne(appoint.getStaffId());
                 ServiceReportEntity serviceReportEntity = new ServiceReportEntity();
                 serviceReportEntity.setResult(appoint.getSummary());
                 serviceReportEntity.setNote(appoint.getNote());
+                serviceReportEntity.setHtmlReport(appoint.getHtmlReport());
                 serviceReportEntity.setServiceByServiceId(serviceEntity);
-                serviceReportEntity.setStaffByStaffId(staff);
+                serviceReportEntity.setStaffByStaffId(staffEntity);
                 serviceReportEntity.setMedicalExaminationByMedicalExaminationId(mee);
                 serviceReportEntity.setStatus(1);
                 serviceReportEntity.setCreatedAt(new Date());
@@ -349,6 +390,8 @@ public class SubclinicalServiceImpl {
         }
 
         ret.setMedicalExamId(mee.getId());
+        ret.setMedicalExaminationCode(mee.getMedicalExaminationCode());
+        ret.setPatientId(patientEntity.getId());
         ret.setPatientCode(patientEntity.getPatientCode());
         ret.setPatientName(patientEntity.getPatientName());
         ret.setPhone(patientEntity.getPhone());
@@ -388,6 +431,8 @@ public class SubclinicalServiceImpl {
         InfoSubclinicalDTO infoSubclinicalDTO = new InfoSubclinicalDTO();
 
         infoSubclinicalDTO.setMedicalExamId(m.getId());
+        infoSubclinicalDTO.setMedicalExaminationCode(m.getMedicalExaminationCode());
+        infoSubclinicalDTO.setPatientId(p.getId());
         infoSubclinicalDTO.setPatientCode(p.getPatientCode());
         infoSubclinicalDTO.setPatientName(p.getPatientName());
         infoSubclinicalDTO.setPhone(p.getPhone());
@@ -406,6 +451,7 @@ public class SubclinicalServiceImpl {
             sdto.setStatus(s.getStatus());
             sdto.setSummary(s.getResult());
             sdto.setNote(s.getNote());
+            sdto.setHtmlReport(s.getHtmlReport());
             listAppoint.add(sdto);
         }
         infoSubclinicalDTO.setListAppoint(listAppoint);

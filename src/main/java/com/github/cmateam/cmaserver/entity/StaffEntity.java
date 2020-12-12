@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "staff", schema = "cma", catalog = "postgres")
+@Table(name = "staff")
 public class StaffEntity extends BaseEntity {
     private String fullName;
     private String email;

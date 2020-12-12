@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "appointment", schema = "cma", catalog = "postgres")
+@Table(name = "appointment")
 public class AppointmentEntity extends BaseEntity {
     private Date dayOfExamination;
     private String time;

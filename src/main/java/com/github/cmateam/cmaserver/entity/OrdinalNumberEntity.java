@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "ordinal_number", schema = "cma", catalog = "postgres")
+@Table(name = "ordinal_number")
 public class OrdinalNumberEntity extends BaseEntity {
     private Date dayOfExamination;
     private Short ordinalNumber;

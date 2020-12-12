@@ -189,17 +189,28 @@ public class ServiceServiceImpl {
 		}
 	}
 
+	public Boolean isDuplicate(String serviceName) {
+		List<String> lstString = serviceRepository.getAllServiceName();
+		for (int i = 0; i < lstString.size(); i++) {
+			if (lstString.get(i).equalsIgnoreCase(serviceName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public Boolean createNewService(ServiceAddEditDTO serviceAddEditDTO) {
 		ServiceEntity serviceEntity = new ServiceEntity();
 		serviceEntity.setStatus(1);
 		serviceEntity.setUpdatedAt(new Date());
 		serviceEntity.setCreatedAt(new Date());
-		if (!serviceRepository.getAllServiceName().contains(serviceAddEditDTO.getServiceName())) {
+		String serviceName = serviceAddEditDTO.getServiceName().trim();
+		if (isDuplicate(serviceName) == true) {
+			return false;
+		} else {
 			serviceEntity.setServiceName(serviceAddEditDTO.getServiceName());
 			serviceEntity.setServiceNameSearch(
 					vNCharacterUtils.removeAccent(serviceAddEditDTO.getServiceName()).toLowerCase());
-		} else {
-			return false;
 		}
 		serviceEntity.setPrice(serviceAddEditDTO.getPrice());
 		serviceEntity.setUnitName("lần");
@@ -283,4 +294,20 @@ public class ServiceServiceImpl {
 		return ResponseEntity.status(HttpStatus.OK).body(servicePaggingDTO);
 	}
 
+	public List<ServiceDTO> findServiceByStaff(String serviceName, String userName) {
+		String userGroup = groupServiceRepository.checkGroupUser(userName);
+		serviceName = '%' + vNCharacterUtils.removeAccent(serviceName).toLowerCase() + '%';
+		StaffEntity staff = staffServiceImpl.getStaffEntityByUsername(userName);
+		List<ServiceEntity> lstServiceEntity;
+		if (userGroup.equalsIgnoreCase("ROLE_MANAGER")) {
+			lstServiceEntity = serviceRepository.getServiceByManager(serviceName);
+		} else {
+			lstServiceEntity = serviceRepository.getServiceByStaffId(serviceName, staff.getId());
+		}
+		List<ServiceDTO> lstServiceDTO = new ArrayList<>();
+		for (ServiceEntity s : lstServiceEntity) {
+			lstServiceDTO.add(convertDTO(s));
+		}
+		return lstServiceDTO;
+	}
 }

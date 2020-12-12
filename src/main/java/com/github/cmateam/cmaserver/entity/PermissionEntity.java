@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 
 @Entity
-@Table(name = "permission", schema = "cma", catalog = "postgres")
+@Table(name = "permission")
 public class PermissionEntity extends BaseEntity {
     private String permissionCode;
     private String permissionName;

@@ -1,5 +1,7 @@
 package com.github.cmateam.cmaserver.service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,12 +18,15 @@ import com.github.cmateam.cmaserver.dto.AppointmentDTO;
 import com.github.cmateam.cmaserver.dto.AppointmentSearchDTO;
 import com.github.cmateam.cmaserver.dto.OrdinalNumberDTO;
 import com.github.cmateam.cmaserver.dto.PatientDTO;
+import com.github.cmateam.cmaserver.dto.ReceiveAppointmentDTO;
 import com.github.cmateam.cmaserver.dto.StaffDTO;
 import com.github.cmateam.cmaserver.entity.AppointmentEntity;
 import com.github.cmateam.cmaserver.entity.OrdinalNumberEntity;
 import com.github.cmateam.cmaserver.entity.PatientEntity;
+import com.github.cmateam.cmaserver.entity.RoomServiceEntity;
 import com.github.cmateam.cmaserver.entity.StaffEntity;
 import com.github.cmateam.cmaserver.repository.AppointmentRepository;
+import com.github.cmateam.cmaserver.repository.OrdinalNumberRepository;
 import com.github.cmateam.cmaserver.repository.StaffRepository;
 
 @Service
@@ -31,14 +36,19 @@ public class AppointmentServiceImpl {
 	private PatientServiceImpl patientServiceImpl;
 	private StaffRepository staffRepository;
 	private VNCharacterUtils vNCharacterUtils;
+	private OrdinalNumberRepository ordinalNumberRepository;
+	private OrdinalNumberServiceImpl ordinalNumberServiceImpl;
 
 	@Autowired
 	public AppointmentServiceImpl(AppointmentRepository appointmentRepository, PatientServiceImpl patientServiceImpl,
-			VNCharacterUtils vNCharacterUtils, StaffRepository staffRepository) {
+			VNCharacterUtils vNCharacterUtils, StaffRepository staffRepository,
+			OrdinalNumberRepository ordinalNumberRepository, OrdinalNumberServiceImpl ordinalNumberServiceImpl) {
 		this.appointmentRepository = appointmentRepository;
 		this.patientServiceImpl = patientServiceImpl;
 		this.staffRepository = staffRepository;
 		this.vNCharacterUtils = vNCharacterUtils;
+		this.ordinalNumberRepository = ordinalNumberRepository;
+		this.ordinalNumberServiceImpl = ordinalNumberServiceImpl;
 	}
 
 	public AppointmentDTO convertEntityToDTO(AppointmentEntity a) {
@@ -105,7 +115,7 @@ public class AppointmentServiceImpl {
 		int minute = Integer.parseInt(arrTime[1]);
 		if (minute < 7) {
 			minute = 0;
-			return String.valueOf(hours) + ":" + String.valueOf(minute);
+			return String.valueOf(hours) + ":" + String.valueOf(minute) + "0";
 		}
 		if (minute >= 7 && minute < 22) {
 			minute = 15;
@@ -125,7 +135,7 @@ public class AppointmentServiceImpl {
 			if (hours == 24) {
 				hours = 0;
 			}
-			return String.valueOf(hours) + ":" + String.valueOf(minute);
+			return String.valueOf(hours) + ":" + String.valueOf(minute) + "0";
 		}
 		return String.valueOf(hours) + ":" + String.valueOf(minute);
 	}
@@ -135,9 +145,8 @@ public class AppointmentServiceImpl {
 		appointmentTime = processAppointmentTime(appointmentTime);
 		AppointmentEntity ame = new AppointmentEntity();
 		if (appointmentRepository.getAllDayOfExaminationByPatientCode(patientCode).contains(appointmentDate)) {
-			AppointmentDTO adto = new AppointmentDTO();
-			adto.setAppointmentDateExist(true);
-			return adto;
+			AppointmentEntity amee = appointmentRepository.getAppointmentByPatientCodeAndDate(patientCode, appointmentDate);
+			appointmentRepository.delete(amee);
 		}
 		PatientEntity patientEntity = patientServiceImpl.updatePatient(patientCode, patientName, dateOfBirth, gender,
 				address, phone, debt);
@@ -163,7 +172,34 @@ public class AppointmentServiceImpl {
 		}
 		ame = appointmentRepository.save(ame);
 
+		if (isSameDay(appointmentDate, new Date())) {
+			StaffEntity staff = ame.getStaffByStaffId();
+			if (staff != null) {
+				List<RoomServiceEntity> currentRoom = staff.getRoomServicesById();
+				if (currentRoom.size() != 0) {
+					Short newOrdinalNumber = ordinalNumberServiceImpl.getOrdinalByRoom(currentRoom.get(0).getId());
+					OrdinalNumberEntity ordinal = new OrdinalNumberEntity();
+					ordinal.setDayOfExamination(new Date());
+					ordinal.setOrdinalNumber(newOrdinalNumber);
+					ordinal.setRoomServiceByRoomServiceId(currentRoom.get(0));
+					ordinal.setStaffByStaffId(staff);
+					ordinal.setCreatedAt(new Date());
+					ordinal.setUpdatedAt(new Date());
+					ordinal.setStatus(1);
+					ordinal = ordinalNumberRepository.save(ordinal);
+					ame.setOrdinalNumberByOrdinalNumberId(ordinal);
+					ame = appointmentRepository.save(ame);
+				}
+			}
+		}
+
 		return convertEntityToDTO(ame);
+	}
+
+	public boolean isSameDay(Date date1, Date date2) {
+		LocalDate localDate1 = date1.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		LocalDate localDate2 = date2.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		return localDate1.isEqual(localDate2);
 	}
 
 	public ResponseEntity<?> getAppointmentPagging(Integer pageIndex, Integer pageSize) {
@@ -232,6 +268,13 @@ public class AppointmentServiceImpl {
 		AppointmentEntity appointmentEntity = appointmentRepository.getOne(id);
 		appointmentEntity.setStatus(status);
 		appointmentEntity = appointmentRepository.save(appointmentEntity);
+		if (status == 0) {
+			OrdinalNumberEntity o = appointmentEntity.getOrdinalNumberByOrdinalNumberId();
+			if (o != null) {
+				o.setStatus(0);
+				ordinalNumberRepository.save(o);
+			}
+		}
 		if (appointmentEntity.getStatus() == status) {
 			return true;
 		} else {
@@ -321,5 +364,45 @@ public class AppointmentServiceImpl {
 		appointmentEntity.setDayOfExamination(appointmentDate);
 		appointmentEntity = appointmentRepository.save(appointmentEntity);
 		return convertEntityToDTO(appointmentEntity);
+	}
+
+	public AppointmentDTO getAppointmentByPatientId(UUID appointmentId) {
+		AppointmentEntity appointmentEntity = appointmentRepository.getOne(appointmentId);
+		return convertEntityToDTO(appointmentEntity);
+	}
+
+	public ReceiveAppointmentDTO getReceivePatient(UUID id) {
+		ReceiveAppointmentDTO ret = new ReceiveAppointmentDTO();
+		AppointmentEntity appointmentEntity = appointmentRepository.getOne(id);
+		if (appointmentEntity == null) {
+			return ret;
+		}
+		PatientDTO patientDto = new PatientDTO();
+		PatientEntity patientEntity = appointmentEntity.getPatientByPatientId();
+		if (patientEntity != null && patientEntity.getStatus() == 1) {
+			patientDto = convertPatientDTO(patientEntity);
+			ret.setPatientDTO(patientDto);
+		}
+		OrdinalNumberEntity o = appointmentEntity.getOrdinalNumberByOrdinalNumberId();
+		if (o != null) {
+			ret.setOrdinal(o.getOrdinalNumber());
+			ret.setStaffId(o.getStaffByStaffId().getId());
+			ret.setRoomId(o.getRoomServiceByRoomServiceId().getId());
+		}
+
+		return ret;
+	}
+
+	public PatientDTO convertPatientDTO(PatientEntity patient) {
+		PatientDTO patientDTO = new PatientDTO();
+		patientDTO.setId(patient.getId());
+		patientDTO.setPatientName(patient.getPatientName());
+		patientDTO.setPatientCode(patient.getPatientCode());
+		patientDTO.setDateOfBirth(patient.getDateOfBirth());
+		patientDTO.setGender(patient.getGender());
+		patientDTO.setAddress(patient.getAddress());
+		patientDTO.setPhone(patient.getPhone());
+		patientDTO.setDebt(patient.getDebt());
+		return patientDTO;
 	}
 }

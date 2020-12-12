@@ -12,7 +12,9 @@ import com.github.cmateam.cmaserver.service.MedicalExamServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,8 +65,9 @@ public class MedicalExamController {
 	}
 
 	// @GetMapping("/check-medical-exam-exist-by-phone")
-	// public MedicalExamDTO checkMedicalExamByPhone(@RequestParam("phone") String phone) {
-	// 	return medicalExamServiceImpl.checkMedicalExamByPhone(phone);
+	// public MedicalExamDTO checkMedicalExamByPhone(@RequestParam("phone") String
+	// phone) {
+	// return medicalExamServiceImpl.checkMedicalExamByPhone(phone);
 	// }
 
 	@PutMapping("/change-status")
@@ -100,5 +103,15 @@ public class MedicalExamController {
 		return medicalExamServiceImpl.updateMedicalExam(medicalExamId, patientCode, patientName, phone, dateOfBirth,
 				gender, address, debt, examinationReason, bloodVessel, bloodPressure, breathing, temperature, height,
 				weight, symptom, summary, mainDisease, mainDiseaseCode, extraDisease, extraDiseaseCode, username);
+	}
+
+	@PutMapping("/update-html-report")
+	public Boolean updateHtmlReport(@RequestParam UUID id, @RequestParam String htmlReport) {
+		return medicalExamServiceImpl.updateHtmlReport(id, htmlReport);
+	}
+
+	@GetMapping(value = "{id}")
+	public ResponseEntity<?> getOneMedicalExam(@PathVariable("id") UUID id) {
+		return medicalExamServiceImpl.getOneMedicalExam(id);
 	}
 }

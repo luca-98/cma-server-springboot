@@ -13,6 +13,7 @@ import com.github.cmateam.cmaserver.entity.RoomServiceEntity;
 import com.github.cmateam.cmaserver.entity.StaffEntity;
 import com.github.cmateam.cmaserver.entity.UserGroupEntity;
 import com.github.cmateam.cmaserver.repository.AppUserRepository;
+import com.github.cmateam.cmaserver.repository.PermissionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -27,13 +28,15 @@ public class AuthenticationServiceImpl {
 	private AuthenticationManager authenticationManager;
 	private AppUserRepository appUserRepository;
 	private TokenAuthenticationService tokenService;
+	private PermissionRepository permissionRepository;
 
 	@Autowired
 	public AuthenticationServiceImpl(AuthenticationManager authenticationManager, AppUserRepository appUserRepository,
-			TokenAuthenticationService tokenService) {
+			TokenAuthenticationService tokenService, PermissionRepository permissionRepository) {
 		this.authenticationManager = authenticationManager;
 		this.appUserRepository = appUserRepository;
 		this.tokenService = tokenService;
+		this.permissionRepository = permissionRepository;
 	}
 
 	public UserLoginDTO login(String userName, String password) {
@@ -49,7 +52,12 @@ public class AuthenticationServiceImpl {
 					return null;
 				}
 				UserGroupEntity userGroupEntity = appUserEntity.getUserGroupByUserGroupId();
-				Collection<PermissionEntity> permissionEntities = userGroupEntity.getPermissionsById();
+				Collection<PermissionEntity> permissionEntities;
+				if (userGroupEntity.getUserGroupCode().equals("ROLE_MANAGER")) {
+					permissionEntities = permissionRepository.findAll();
+				} else {
+					permissionEntities = userGroupEntity.getPermissionsById();
+				}
 				List<String> listPermissionCode = new ArrayList<>();
 				for (PermissionEntity p : permissionEntities) {
 					listPermissionCode.add(p.getPermissionCode());

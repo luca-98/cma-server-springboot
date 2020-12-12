@@ -1,5 +1,3 @@
-set time zone + 7;
-create extension if not exists "uuid-ossp";
 create table if not exists user_group (
   id uuid not null primary key,
   user_group_code varchar(128) not null unique,
@@ -11,7 +9,7 @@ create table if not exists user_group (
 create table if not exists permission (
   id uuid not null primary key,
   permission_code varchar(128) not null unique,
-  permission_name varchar(128) not null unique,
+  permission_name varchar(128) not null,
   status smallint,
   created_at timestamp,
   updated_at timestamp

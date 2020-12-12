@@ -81,6 +81,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests() //
                 .antMatchers(HttpMethod.POST, "/auth/login").permitAll() // tất cả mọi người có quyền truy cập method POST củacủa /auth/login
                 .antMatchers("/ws/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/image/**").permitAll()
                 .anyRequest().authenticated(); // tất cả link còn lại cần được xác thực
         http.addFilterBefore(new JWTAuthenticationFilter(tokenAuthenticationService, userDetailsService),
                 UsernamePasswordAuthenticationFilter.class).sessionManagement()

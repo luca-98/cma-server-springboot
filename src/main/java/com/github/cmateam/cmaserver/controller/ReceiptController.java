@@ -35,4 +35,9 @@ public class ReceiptController {
 		return receiptServiceImpl.searchAutoNameReceipt(receiptName);
 	}
 
+	@GetMapping("/auto-search-unitName")
+	public List<String> searchAutoNameUnitName(@RequestParam("unitName") String unitName) {
+		return receiptServiceImpl.searchAutoNameUnitName(unitName);
+	}
+
 }

@@ -29,7 +29,7 @@ public class ReceiptVoucherController {
 	}
 
 	@GetMapping("/get-number-voucher")
-	public Integer getVoucherNumber() {
+	public Long getVoucherNumber() {
 		return receiptVoucherServiceImpl.getVoucherNumber();
 	}
 

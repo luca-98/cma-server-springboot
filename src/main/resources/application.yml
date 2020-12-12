@@ -1,18 +1,3 @@
-spring:
-    application:
-        name: CMA - Clinic Management Application
-    datasource:
-        url: jdbc:postgresql://116.107.235.162:5432/postgres?currentSchema=cma
-        username: postgres
-        password: 12345678
-    flyway:
-        schemas: cma
-    jpa:
-        show-sql: false
-        properties:
-            hibernate:
-                enable_lazy_load_no_trans: true
-
 server:
   error:
     include-stacktrace: never
@@ -24,3 +9,42 @@ cma:
     token-prefix: Bearer
     token-expiration: 604800000 # token's expiry date: 7 day
     template-patients: classpath:file/Template_Danh_Sach_Benh_Nhan.xlsx
+
+spring:
+    profiles:
+        active: "dev"
+    application:
+        name: CMA - Clinic Management Application
+    jpa:
+        show-sql: false
+        properties:
+            hibernate:
+                enable_lazy_load_no_trans: true
+    servlet:
+        multipart:
+            enabled: true
+            file-size-threshold: 2KB
+            max-file-size: 3000MB
+            max-request-size: 3015MB
+
+---
+
+spring:
+    profiles: dev
+    datasource:
+        url: jdbc:postgresql://34.96.187.193:5432/postgres?currentSchema=cma
+        username: postgres
+        password: "!CM@T3am_P@sSw0rd"
+    flyway:
+        schemas: cma
+
+---
+
+spring:
+    profiles: test
+    datasource:
+        url: jdbc:postgresql://116.101.25.228:5432/postgres?currentSchema=cma
+        username: postgres
+        password: "!CM@T3am_P@sSw0rd"
+
+

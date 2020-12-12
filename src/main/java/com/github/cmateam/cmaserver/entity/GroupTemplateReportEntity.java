@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "group_template_report", schema = "cma", catalog = "postgres")
+@Table(name = "group_template_report")
 public class GroupTemplateReportEntity extends BaseEntity {
     private String groupTemplateName;
     private List<TemplateReportEntity> templateReportsById;

@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "app_user", schema = "cma", catalog = "postgres")
+@Table(name = "app_user")
 public class AppUserEntity extends BaseEntity {
     private String userName;
     private String encryptedPassword;

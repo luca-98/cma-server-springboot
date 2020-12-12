@@ -12,6 +12,7 @@ public class WebSocketService {
     private static final String SUBSCRIBE_TOPIC_UPDATE_RECEVIE = "/topic/receive-patient";
     private static final String SUBSCRIBE_TOPIC_UPDATE_ROOM_SERVICE = "/topic/room-service";
     private static final String SUBSCRIBE_TOPIC_UPDATE_ORDINAL_NUMBER = "/topic/ordinal-number";
+    private static final String SUBSCRIBE_TOPIC_UPDATE_PERMISSION = "/topic/permission";
 
     private SimpMessagingTemplate simpMessagingTemplate;
 
@@ -30,5 +31,9 @@ public class WebSocketService {
 
     public void updateOrdinalNumber(ReceivePatientDTO receivePatientDTO) {
         simpMessagingTemplate.convertAndSend(SUBSCRIBE_TOPIC_UPDATE_ORDINAL_NUMBER, receivePatientDTO);
+    }
+
+    public void updatePermission() {
+        simpMessagingTemplate.convertAndSend(SUBSCRIBE_TOPIC_UPDATE_PERMISSION, true);
     }
 }

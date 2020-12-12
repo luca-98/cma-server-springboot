@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "invoice", schema = "cma", catalog = "postgres")
+@Table(name = "invoice")
 public class InvoiceEntity extends BaseEntity {
     private Long totalAmount;
     private Long amountPaid;

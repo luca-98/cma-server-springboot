@@ -27,6 +27,7 @@ public class MedicalExamDTO {
     private Integer status;
     private Date createdAt;
     private Date updatedAt;
+    private String printDataHtml;
 
     public UUID getId() {
         return this.id;
@@ -210,6 +211,14 @@ public class MedicalExamDTO {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getPrintDataHtml() {
+        return this.printDataHtml;
+    }
+
+    public void setPrintDataHtml(String printDataHtml) {
+        this.printDataHtml = printDataHtml;
     }
 
 }

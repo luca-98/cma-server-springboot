@@ -6,12 +6,14 @@ import java.util.UUID;
 
 import com.github.cmateam.cmaserver.dto.AppointmentDTO;
 import com.github.cmateam.cmaserver.dto.PatientDTO;
+import com.github.cmateam.cmaserver.dto.ReceiveAppointmentDTO;
 import com.github.cmateam.cmaserver.service.AppointmentServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -92,4 +94,13 @@ public class AppointmentController {
 		return appointmentServiceImpl.editAppointmentCreated(appointmentId, appointmentDate, staffId, appointmentTime);
 	}
 
+	@GetMapping("/get-appointment-by-id")
+	public AppointmentDTO getAppointmentByPatientId(@RequestParam("appointmentId") UUID appointmentId) {
+		return appointmentServiceImpl.getAppointmentByPatientId(appointmentId);
+	}
+
+	@GetMapping(value = "/get-receive-by-appointmnet/{id}")
+	public ReceiveAppointmentDTO getReceiveByAppointment(@PathVariable UUID id) {
+		return appointmentServiceImpl.getReceivePatient(id);
+	}
 }

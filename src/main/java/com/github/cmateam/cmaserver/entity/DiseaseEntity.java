@@ -3,7 +3,7 @@ package com.github.cmateam.cmaserver.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "disease", schema = "cma", catalog = "postgres")
+@Table(name = "disease")
 public class DiseaseEntity extends BaseEntity {
     private String icd10Code;
     private String diseaseName;

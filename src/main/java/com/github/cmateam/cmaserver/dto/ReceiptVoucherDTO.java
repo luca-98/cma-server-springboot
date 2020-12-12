@@ -7,10 +7,19 @@ public class ReceiptVoucherDTO {
 	private UUID receiptVoucherId;
 	private Date receiptVoucherDate;
 	private Long receiptVoucherAmount;
+	private Long voucherNumber;
 	private String receiptVoucherDescription;
-	private PatientDTO patient;
 	private StaffDTO staff;
 	private String nameOfVoucherType;
+	private String objectReceipt;
+
+	public String getObjectReceipt() {
+		return objectReceipt;
+	}
+
+	public void setObjectReceipt(String objectReceipt) {
+		this.objectReceipt = objectReceipt;
+	}
 
 	public UUID getReceiptVoucherId() {
 		return receiptVoucherId;
@@ -44,14 +53,6 @@ public class ReceiptVoucherDTO {
 		this.receiptVoucherDescription = receiptVoucherDescription;
 	}
 
-	public PatientDTO getPatient() {
-		return patient;
-	}
-
-	public void setPatient(PatientDTO patient) {
-		this.patient = patient;
-	}
-
 	public StaffDTO getStaff() {
 		return staff;
 	}
@@ -66,6 +67,14 @@ public class ReceiptVoucherDTO {
 
 	public void setNameOfVoucherType(String nameOfVoucherType) {
 		this.nameOfVoucherType = nameOfVoucherType;
+	}
+
+	public Long getVoucherNumber() {
+		return voucherNumber;
+	}
+
+	public void setVoucherNumber(Long voucherNumber) {
+		this.voucherNumber = voucherNumber;
 	}
 
 }

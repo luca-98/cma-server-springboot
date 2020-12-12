@@ -3,7 +3,7 @@ package com.github.cmateam.cmaserver.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "receipt_detail", schema = "cma", catalog = "postgres")
+@Table(name = "receipt_detail")
 public class ReceiptDetailEntity extends BaseEntity {
     private Short quantity;
     private Long amount;

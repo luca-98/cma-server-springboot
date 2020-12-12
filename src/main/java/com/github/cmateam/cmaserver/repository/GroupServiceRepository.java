@@ -16,6 +16,9 @@ public interface GroupServiceRepository extends JpaRepository<GroupServiceEntity
 	@Query("select gs.id from GroupServiceEntity gs where gs.status = 1 and gs.groupServiceCode != 'CLINICAL_EXAMINATION'")
 	List<UUID> findAllWithStatusActiveAndWithoutCE();
 
+	@Query("select gs.id from GroupServiceEntity gs where gs.status = 1")
+	List<UUID> findAllWithStatusActiveUuids();
+
 	@Query("select gs.id from StaffEntity s join s.groupServicesById gs where gs.status = 1 and s.id = ?1")
 	List<UUID> findAllFollowStaffWithStatusActive(UUID id);
 
@@ -24,5 +27,8 @@ public interface GroupServiceRepository extends JpaRepository<GroupServiceEntity
 
 	@Query("select s.id from StaffEntity s join s.appUserByAppUserId au where au.userName like ?1")
 	UUID getStaffIDByUsername(String username);
+	
+	@Query("select gs.groupServiceName from GroupServiceEntity gs where gs.status <> 0 order by gs.createdAt DESC")
+	List<String> getAllGroupServiceName();
 
 }

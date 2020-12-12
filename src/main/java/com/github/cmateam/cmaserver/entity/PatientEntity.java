@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "patient", schema = "cma", catalog = "postgres")
+@Table(name = "patient")
 public class PatientEntity extends BaseEntity {
     private String patientName;
     private String patientNameSearch;

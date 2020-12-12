@@ -8,6 +8,7 @@ public class SubclinicalAppointDTO {
     private UUID staffId;
     private String summary;
     private String note;
+    private String htmlReport;
     private Integer status;
 
     public UUID getServiceReportId() {
@@ -48,6 +49,14 @@ public class SubclinicalAppointDTO {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public String getHtmlReport() {
+        return this.htmlReport;
+    }
+
+    public void setHtmlReport(String htmlReport) {
+        this.htmlReport = htmlReport;
     }
 
     public Integer getStatus() {

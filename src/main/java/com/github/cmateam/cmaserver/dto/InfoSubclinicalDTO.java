@@ -7,6 +7,7 @@ import java.util.UUID;
 public class InfoSubclinicalDTO {
     private UUID medicalExamId;
     private String medicalExaminationCode;
+    private UUID patientId;
     private String patientCode;
     private String patientName;
     private String phone;
@@ -30,6 +31,14 @@ public class InfoSubclinicalDTO {
 
     public void setMedicalExaminationCode(String medicalExaminationCode) {
         this.medicalExaminationCode = medicalExaminationCode;
+    }
+
+    public UUID getPatientId() {
+        return this.patientId;
+    }
+
+    public void setPatientId(UUID patientId) {
+        this.patientId = patientId;
     }
 
     public String getPatientCode() {

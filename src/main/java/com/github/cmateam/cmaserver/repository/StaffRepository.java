@@ -21,4 +21,6 @@ public interface StaffRepository extends JpaRepository<StaffEntity, UUID> {
 	@Query("SELECT g.groupServiceCode FROM StaffEntity s JOIN s.groupServicesById g WHERE s.id=?1 AND s.status=1")
 	List<String> getGroupServiceCodeByStaff(UUID staffId);
 
+	@Query("SELECT g.groupServiceCode FROM StaffEntity s JOIN s.groupServicesById g WHERE s.status=1")
+	List<String> getAllGroupServiceCode();
 }

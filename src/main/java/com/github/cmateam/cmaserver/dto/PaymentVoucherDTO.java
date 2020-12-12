@@ -8,9 +8,10 @@ public class PaymentVoucherDTO {
 	private Date paymentVoucherDate;
 	private Long paymentVoucherAmount;
 	private String paymentVoucherDescription;
-	private PatientDTO patient;
-	private StaffDTO staff;
 	private String nameOfVoucherType;
+	private Long voucherNumber;
+	private String objectPayment;
+	private StaffDTO staff;
 
 	public UUID getPaymentVoucherId() {
 		return paymentVoucherId;
@@ -44,12 +45,20 @@ public class PaymentVoucherDTO {
 		this.paymentVoucherDescription = paymentVoucherDescription;
 	}
 
-	public PatientDTO getPatient() {
-		return patient;
+	public String getObjectPayment() {
+		return objectPayment;
 	}
 
-	public void setPatient(PatientDTO patient) {
-		this.patient = patient;
+	public void setObjectPayment(String objectPayment) {
+		this.objectPayment = objectPayment;
+	}
+
+	public String getNameOfVoucherType() {
+		return nameOfVoucherType;
+	}
+
+	public void setNameOfVoucherType(String nameOfVoucherType) {
+		this.nameOfVoucherType = nameOfVoucherType;
 	}
 
 	public StaffDTO getStaff() {
@@ -60,12 +69,12 @@ public class PaymentVoucherDTO {
 		this.staff = staff;
 	}
 
-	public String getNameOfVoucherType() {
-		return nameOfVoucherType;
+	public Long getVoucherNumber() {
+		return voucherNumber;
 	}
 
-	public void setNameOfVoucherType(String nameOfVoucherType) {
-		this.nameOfVoucherType = nameOfVoucherType;
+	public void setVoucherNumber(Long voucherNumber) {
+		this.voucherNumber = voucherNumber;
 	}
 
 }

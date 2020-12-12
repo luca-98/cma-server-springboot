@@ -22,6 +22,7 @@ import com.github.cmateam.cmaserver.dto.MedicineSaleTableDTO;
 import com.github.cmateam.cmaserver.dto.PatientDTO;
 import com.github.cmateam.cmaserver.dto.PrescriptionDTO;
 import com.github.cmateam.cmaserver.dto.StaffDTO;
+import com.github.cmateam.cmaserver.entity.CountIdEntity;
 import com.github.cmateam.cmaserver.entity.InvoiceDetailedEntity;
 import com.github.cmateam.cmaserver.entity.InvoiceEntity;
 import com.github.cmateam.cmaserver.entity.MedicineEntity;
@@ -31,6 +32,7 @@ import com.github.cmateam.cmaserver.entity.PatientEntity;
 import com.github.cmateam.cmaserver.entity.PrescriptionDetailEntity;
 import com.github.cmateam.cmaserver.entity.PrescriptionEntity;
 import com.github.cmateam.cmaserver.entity.StaffEntity;
+import com.github.cmateam.cmaserver.repository.CountIdRepository;
 import com.github.cmateam.cmaserver.repository.InvoiceDetailedRepository;
 import com.github.cmateam.cmaserver.repository.InvoiceRepository;
 import com.github.cmateam.cmaserver.repository.MedicineRepository;
@@ -54,6 +56,7 @@ public class MedicineSaleServiceImpl {
 	private MedicineImpl medicineImpl;
 	private VNCharacterUtils vNCharacterUtils;
 	private PrescriptionDetailRepository prescriptionDetailRepository;
+	private CountIdRepository countIdRepository;
 
 	@Autowired
 	public MedicineSaleServiceImpl(PrescriptionServiceImpl prescriptionServiceImpl,
@@ -62,7 +65,7 @@ public class MedicineSaleServiceImpl {
 			MedicineRepository medicineRepository, MedicineSaleDetailRepository medicineSaleDetailRepository,
 			StaffServiceImpl staffServiceImpl, InvoiceDetailedRepository invoiceDetailedRepository,
 			MedicineImpl medicineImpl, VNCharacterUtils vNCharacterUtils,
-			PrescriptionDetailRepository prescriptionDetailRepository) {
+			PrescriptionDetailRepository prescriptionDetailRepository,CountIdRepository countIdRepository) {
 		this.prescriptionRepository = prescriptionRepository;
 		this.prescriptionServiceImpl = prescriptionServiceImpl;
 		this.medicineSaleRepository = medicineSaleRepository;
@@ -75,6 +78,7 @@ public class MedicineSaleServiceImpl {
 		this.medicineImpl = medicineImpl;
 		this.vNCharacterUtils = vNCharacterUtils;
 		this.prescriptionDetailRepository = prescriptionDetailRepository;
+		this.countIdRepository = countIdRepository;
 	}
 
 	public List<PrescriptionDTO> getgetPrescriptionByPatientId(UUID patientId) {
@@ -97,7 +101,28 @@ public class MedicineSaleServiceImpl {
 	}
 
 	public boolean saveMedicineSale(MedicineSaleSaveDTO medicineSaleSaveDTO) {
-		PatientEntity patientEntity = patientRepository.getOne(medicineSaleSaveDTO.getPatientId());
+		PatientEntity patientEntity = null;
+		if(medicineSaleSaveDTO.getPatientId() != null) {
+			patientEntity = patientRepository.getOne(medicineSaleSaveDTO.getPatientId());
+		}else {
+			patientEntity = new PatientEntity();
+			CountIdEntity countIdEntity = countIdRepository.findByCountName("PATIENT_CODE");
+			Integer index = countIdEntity.getCountValue();
+			countIdEntity.setCountValue(index + 1);
+			countIdRepository.save(countIdEntity);
+			Date date = new Date();
+			SimpleDateFormat formatter = new SimpleDateFormat("ddMMyy");
+			String strDate = formatter.format(date);
+			String patientCode = String.format("BN%s%03d", strDate, index);
+			patientEntity.setPatientCode(patientCode);
+			patientEntity.setStatus(1);
+			patientEntity.setUpdatedAt(new Date());
+			patientEntity.setCreatedAt(new Date());
+			patientEntity.setDebt(0L);
+			patientEntity.setPatientName(medicineSaleSaveDTO.getPatientName());
+			patientEntity.setPatientNameSearch(vNCharacterUtils.removeAccent(medicineSaleSaveDTO.getPatientName()).toLowerCase());
+			patientRepository.save(patientEntity);
+		}
 		PrescriptionDetailEntity prescriptionDetailEntity = new PrescriptionDetailEntity();
 		MedicineSaleEntity medicineSaleEntity = null;
 		boolean isAddNew = true;
@@ -231,7 +256,7 @@ public class MedicineSaleServiceImpl {
 	public MedicineSaleDTO convertEntityToDTO(MedicineSaleEntity medicineSaleEntity) {
 		StaffEntity staffEntity = medicineSaleEntity.getStaffByStaffId();
 		StaffDTO staffDTO = new StaffDTO();
-		if (staffEntity != null) {
+		if (staffEntity != null && staffEntity.getStatus() == 1) {
 			staffDTO.setId(staffEntity.getId());
 			staffDTO.setFullName(staffEntity.getFullName());
 			staffDTO.setEmail(staffEntity.getEmail());
@@ -327,6 +352,9 @@ public class MedicineSaleServiceImpl {
 		List<StaffEntity> listStaff = medicineSaleRepository.autoSearchByNameSearchStaff(staffNameSearch, top10);
 		List<StaffDTO> lstStaffDto = new ArrayList<>();
 		for (StaffEntity staffEntity : listStaff) {
+			if (staffEntity.getStatus() != 1) {
+				continue;
+			}
 			StaffDTO staffDTO = new StaffDTO();
 			staffDTO.setId(staffEntity.getId());
 			staffDTO.setFullName(staffEntity.getFullName());

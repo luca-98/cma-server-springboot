@@ -2,8 +2,6 @@ package com.github.cmateam.cmaserver.entity;
 
 import javax.persistence.*;
 
-import org.hibernate.annotations.Type;
-
 import java.util.Date;
 import java.util.UUID;
 
@@ -16,8 +14,7 @@ public class BaseEntity {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue
-    @Type(type = "pg-uuid")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public UUID getId() {
         return id;
     }

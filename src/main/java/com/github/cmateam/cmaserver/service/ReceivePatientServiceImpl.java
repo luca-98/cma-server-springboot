@@ -12,6 +12,7 @@ import com.github.cmateam.cmaserver.dto.ReceivePatientDTO;
 import com.github.cmateam.cmaserver.dto.ReceivePatientPaggingDTO;
 import com.github.cmateam.cmaserver.dto.RoomServiceDTO;
 import com.github.cmateam.cmaserver.dto.StaffDTO;
+import com.github.cmateam.cmaserver.entity.AppointmentEntity;
 import com.github.cmateam.cmaserver.entity.CountIdEntity;
 import com.github.cmateam.cmaserver.entity.InvoiceDetailedEntity;
 import com.github.cmateam.cmaserver.entity.InvoiceEntity;
@@ -22,6 +23,7 @@ import com.github.cmateam.cmaserver.entity.ReceivePatientEntity;
 import com.github.cmateam.cmaserver.entity.RoomServiceEntity;
 import com.github.cmateam.cmaserver.entity.ServiceEntity;
 import com.github.cmateam.cmaserver.entity.StaffEntity;
+import com.github.cmateam.cmaserver.repository.AppointmentRepository;
 import com.github.cmateam.cmaserver.repository.CountIdRepository;
 import com.github.cmateam.cmaserver.repository.InvoiceDetailedRepository;
 import com.github.cmateam.cmaserver.repository.InvoiceRepository;
@@ -55,6 +57,7 @@ public class ReceivePatientServiceImpl {
 	private InvoiceRepository invoiceRepository;
 	private InvoiceDetailedRepository invoiceDetailedRepository;
 	private CountIdRepository countIdRepository;
+	private AppointmentRepository appointmentRepository;
 
 	@Autowired
 	public ReceivePatientServiceImpl(RoomServiceRepository roomServiceRepository,
@@ -63,7 +66,7 @@ public class ReceivePatientServiceImpl {
 			WebSocketService webSocketService, PatientRepository patientRepository, VNCharacterUtils vNCharacterUtils,
 			MedicalExaminationRepository medicalExaminationRepository, ServiceRepository serviceRepository,
 			InvoiceRepository invoiceRepository, InvoiceDetailedRepository invoiceDetailedRepository,
-			CountIdRepository countIdRepository) {
+			CountIdRepository countIdRepository, AppointmentRepository appointmentRepository) {
 		this.roomServiceRepository = roomServiceRepository;
 		this.ordinalNumberRepository = ordinalNumberRepository;
 		this.receivePatientRepository = receivePatientRepository;
@@ -78,10 +81,11 @@ public class ReceivePatientServiceImpl {
 		this.invoiceRepository = invoiceRepository;
 		this.invoiceDetailedRepository = invoiceDetailedRepository;
 		this.countIdRepository = countIdRepository;
+		this.appointmentRepository = appointmentRepository;
 	}
 
 	public ReceivePatientEntity setReceive(Short ordinalNumber, UUID roomServiceId, StaffEntity staffEntity,
-			String examinationReason, PatientEntity patientEntity, UUID doctorId) {
+			String examinationReason, PatientEntity patientEntity, UUID doctorId, UUID appointmentId) {
 		StaffEntity doctor = staffRepository.getOne(doctorId);
 		RoomServiceEntity r = roomServiceRepository.getOne(roomServiceId);
 		Short totalReceive = r.getTotalReceive();
@@ -94,15 +98,50 @@ public class ReceivePatientServiceImpl {
 		roomServiceDTO.setTotalReceive(r.getTotalReceive());
 		roomServiceDTO.setTotalDone(r.getTotalDone());
 		webSocketService.updateRoomService(roomServiceDTO);
-		OrdinalNumberEntity o = new OrdinalNumberEntity();
-		o.setDayOfExamination(new Date());
-		o.setOrdinalNumber(ordinalNumber);
-		o.setRoomServiceByRoomServiceId(r);
-		o.setStaffByStaffId(doctor);
-		o.setStatus(1);
-		o.setCreatedAt(new Date());
-		o.setUpdatedAt(new Date());
-		o = ordinalNumberRepository.save(o);
+
+		OrdinalNumberEntity o = null;
+		if (appointmentId == null) {
+			o = new OrdinalNumberEntity();
+			o.setDayOfExamination(new Date());
+			o.setOrdinalNumber(ordinalNumber);
+			o.setRoomServiceByRoomServiceId(r);
+			o.setStaffByStaffId(doctor);
+			o.setStatus(1);
+			o.setCreatedAt(new Date());
+			o.setUpdatedAt(new Date());
+			o = ordinalNumberRepository.save(o);
+		} else {
+			AppointmentEntity a = appointmentRepository.getOne(appointmentId);
+			if (a == null) {
+				o = new OrdinalNumberEntity();
+				o.setDayOfExamination(new Date());
+				o.setOrdinalNumber(ordinalNumber);
+				o.setRoomServiceByRoomServiceId(r);
+				o.setStaffByStaffId(doctor);
+				o.setStatus(1);
+				o.setCreatedAt(new Date());
+				o.setUpdatedAt(new Date());
+				o = ordinalNumberRepository.save(o);
+			}
+			o = a.getOrdinalNumberByOrdinalNumberId();
+			if (o != null) {
+				o.setStatus(1);
+				o = ordinalNumberRepository.save(o);
+			} else {
+				o = new OrdinalNumberEntity();
+				o.setDayOfExamination(new Date());
+				o.setOrdinalNumber(ordinalNumber);
+				o.setRoomServiceByRoomServiceId(r);
+				o.setStaffByStaffId(doctor);
+				o.setStatus(1);
+				o.setCreatedAt(new Date());
+				o.setUpdatedAt(new Date());
+				o = ordinalNumberRepository.save(o);
+			}
+			a.setOrdinalNumberByOrdinalNumberId(null);
+			a = appointmentRepository.save(a);
+			appointmentRepository.delete(a);
+		}
 
 		MedicalExaminationEntity medicalExam = new MedicalExaminationEntity();
 		CountIdEntity countIdEntity = countIdRepository.findByCountName("MEDICAL_EXAMINATION_CODE");
@@ -136,12 +175,12 @@ public class ReceivePatientServiceImpl {
 
 	public ReceivePatientDTO receivePatient(String patientCode, String patientName, String phone, Date dateOfBirth,
 			Integer gender, String address, Short ordinalNumber, String clinicalExamPrice, UUID roomServiceId,
-			UUID staffId, Long debt, String examinationReason, String username, UUID doctorId) {
+			UUID staffId, Long debt, String examinationReason, String username, UUID doctorId, UUID appointmentId) {
 		PatientEntity patientEntity = patientServiceImpl.updatePatient(patientCode, patientName, dateOfBirth, gender,
 				address, phone, debt);
 		StaffEntity staffEntity = staffServiceImpl.getStaffEntityByUsername(username);
 		ReceivePatientEntity r = setReceive(ordinalNumber, roomServiceId, staffEntity, examinationReason, patientEntity,
-				doctorId);
+				doctorId, appointmentId);
 
 		ReceivePatientDTO receivePatientDTO = convertEntityToDTO(r);
 

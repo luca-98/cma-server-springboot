@@ -46,4 +46,7 @@ public interface ServiceReportRepository extends JpaRepository<ServiceReportEnti
     @Query("FROM ServiceReportEntity sr JOIN sr.staffByStaffId staff JOIN sr.medicalExaminationByMedicalExaminationId m JOIN m.patientByPatientId patient WHERE staff.id=?1 AND m.medicalExaminationCode LIKE ?2 AND patient.patientCode LIKE ?3 AND patient.phone LIKE ?4 AND date_trunc('day', m.createdAt) BETWEEN ?5 AND ?6 AND m.status <> 0 AND sr.status=?7 ORDER BY sr.createdAt DESC")
     List<ServiceReportEntity> searchWithDateRangeWithStatus(UUID staffId, String clinicalExamCode, String patientCode,
             String phone, Date fromDate, Date toDate, Integer status, Pageable pageable);
+    
+    @Query("FROM ServiceReportEntity sr JOIN sr.medicalExaminationByMedicalExaminationId m WHERE m.status <> 0 AND sr.status <> 0 and m.id = ?1 ORDER BY sr.createdAt DESC")
+    List<ServiceReportEntity> getAllServiceReportByMedicalExamId(UUID medicalExamId);
 }

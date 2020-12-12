@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +38,11 @@ public class GroupServiceController {
 	public List<UUID> getAllGroupServiceByStaff(Principal principal) {
 		String username = principal.getName();
 		return groupServiceServiceImpl.getAllServiceFollowStaffWithStatusActive(username);
+	}
+
+	@GetMapping(value = "/get-all-group-service-by-staff-staff-id/{id}")
+	public List<UUID> getAllGroupServiceByStaffStaffId(@PathVariable UUID id) {
+		return groupServiceServiceImpl.getAllGroupServiceByStaffStaffId(id);
 	}
 
 	@GetMapping("/get-detail-group-service")

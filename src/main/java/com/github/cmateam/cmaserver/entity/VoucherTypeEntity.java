@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "voucher_type", schema = "cma", catalog = "postgres")
+@Table(name = "voucher_type")
 public class VoucherTypeEntity extends BaseEntity {
     private String typeName;
     private List<PaymentVoucherEntity> paymentVouchersById;
