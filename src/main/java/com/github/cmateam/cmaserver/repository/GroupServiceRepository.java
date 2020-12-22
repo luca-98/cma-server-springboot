@@ -10,16 +10,16 @@ import com.github.cmateam.cmaserver.entity.GroupServiceEntity;
 
 public interface GroupServiceRepository extends JpaRepository<GroupServiceEntity, UUID> {
 
-	@Query("select gs from GroupServiceEntity gs where gs.status = 1")
+	@Query("select gs from GroupServiceEntity gs where gs.status = 1 order by gs.groupServiceName ASC")
 	List<GroupServiceEntity> findAllWithStatusActive();
 
-	@Query("select gs.id from GroupServiceEntity gs where gs.status = 1 and gs.groupServiceCode != 'CLINICAL_EXAMINATION'")
+	@Query("select gs.id from GroupServiceEntity gs where gs.status = 1 and gs.groupServiceCode != 'CLINICAL_EXAMINATION' order by gs.groupServiceName ASC")
 	List<UUID> findAllWithStatusActiveAndWithoutCE();
 
 	@Query("select gs.id from GroupServiceEntity gs where gs.status = 1")
 	List<UUID> findAllWithStatusActiveUuids();
 
-	@Query("select gs.id from StaffEntity s join s.groupServicesById gs where gs.status = 1 and s.id = ?1")
+	@Query("select gs.id from StaffEntity s join s.groupServicesById gs where gs.status = 1 and s.id = ?1 order by gs.groupServiceName ASC")
 	List<UUID> findAllFollowStaffWithStatusActive(UUID id);
 
 	@Query("select ug.userGroupCode from AppUserEntity au join au.userGroupByUserGroupId ug where au.userName like ?1")

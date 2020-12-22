@@ -20,8 +20,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 
-public class PatientTest extends CmaBaseTest {
-    
+public class ServiceTest extends CmaBaseTest {
+
 	private String token;
 	private UUID userId = UUID.fromString("87a5d03f-e810-42cf-8ef9-5c92a5302790");
 	private AppUserEntity mockUser;
@@ -36,45 +36,51 @@ public class PatientTest extends CmaBaseTest {
 	public void setUp() throws Exception {
 		mockUser = appUserRepository.getOne(userId);
 		token = "Bearer" + tokenAuthenticationService.generateToken(mockUser.getUserName());
-    }
-    
-    @Test
-	void getListPatientReceive() throws Exception {
-		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-		requestParams.add("pageSize", "25");
-		requestParams.add("pageIndex", "0");
-		mockMvc.perform(get("/patient/get-all-patient").params(requestParams)
-				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 	}
-    
-    @Test
-	void getAllPatient() throws Exception {
+
+	@Test
+	void getAllGroupService() throws Exception {
+		mockMvc.perform(get("/group-service/get-all-group-service").header(HttpHeaders.AUTHORIZATION, token)
+				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+	}
+
+	@Test
+	void getAllServicePagging() throws Exception {
 		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-		requestParams.add("pageSize", "25");
 		requestParams.add("pageIndex", "0");
-		mockMvc.perform(get("/patient/get-all-patient").params(requestParams)
+		requestParams.add("pageSize", "25");
+		mockMvc.perform(
+				get("/service/get-all-service-pagging").params(requestParams).header(HttpHeaders.AUTHORIZATION, token)
+						.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void getListRoomServiceByGroupService() throws Exception {
+		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+		requestParams.add("groupServiceCode", "ULTRASOUND");
+		mockMvc.perform(get("/room-service/get-list-room-service-by-group-service").params(requestParams)
 				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 	}
 
 	@Test
-	void getListPatientReceiveBad() throws Exception {
+	void getAllServicePaggingBad() throws Exception {
 		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-		requestParams.add("pageSize", "25");
 		requestParams.add("pageIndex", "0");
-		mockMvc.perform(get("/patient/get-all-patient")
-				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().is(400));
+		requestParams.add("pageSize", "25");
+		mockMvc.perform(
+				get("/service/get-all-service-pagging").header(HttpHeaders.AUTHORIZATION, token)
+						.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().is(400));
 	}
-    
-    @Test
-	void getAllPatientBad() throws Exception {
+
+	@Test
+	void getListRoomServiceByGroupServiceBad() throws Exception {
 		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-		requestParams.add("pageSize", "25");
-		requestParams.add("pageIndex", "0");
-		mockMvc.perform(get("/patient/get-all-patient")
+		requestParams.add("groupServiceCode", "ULTRASOUND");
+		mockMvc.perform(get("/room-service/get-list-room-service-by-group-service")
 				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().is(400));
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().is(200));
 	}
 }

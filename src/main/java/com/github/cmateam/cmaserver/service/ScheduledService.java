@@ -10,6 +10,7 @@ import com.github.cmateam.cmaserver.entity.CountIdEntity;
 import com.github.cmateam.cmaserver.entity.InvoiceDetailedEntity;
 import com.github.cmateam.cmaserver.entity.InvoiceEntity;
 import com.github.cmateam.cmaserver.entity.OrdinalNumberEntity;
+import com.github.cmateam.cmaserver.entity.PatientEntity;
 import com.github.cmateam.cmaserver.entity.RoomServiceEntity;
 import com.github.cmateam.cmaserver.entity.StaffEntity;
 import com.github.cmateam.cmaserver.repository.AppointmentRepository;
@@ -17,6 +18,7 @@ import com.github.cmateam.cmaserver.repository.CountIdRepository;
 import com.github.cmateam.cmaserver.repository.InvoiceDetailedRepository;
 import com.github.cmateam.cmaserver.repository.InvoiceRepository;
 import com.github.cmateam.cmaserver.repository.OrdinalNumberRepository;
+import com.github.cmateam.cmaserver.repository.PatientRepository;
 import com.github.cmateam.cmaserver.repository.RoomServiceRepository;
 
 import org.apache.http.HttpEntity;
@@ -49,12 +51,15 @@ public class ScheduledService {
 	private OrdinalNumberRepository ordinalNumberRepository;
 	private InvoiceDetailedRepository invoiceDetailedRepository;
 	private InvoiceRepository invoiceRepository;
+	private PatientRepository patientRepository;
+	private InvoiceServiceImpl invoiceServiceImpl;
 
 	@Autowired
 	public ScheduledService(CmaConfig cmaConfig, CountIdRepository countIdRepository,
 			RoomServiceRepository roomServiceRepository, AppointmentRepository appointmentRepository,
 			OrdinalNumberServiceImpl ordinalNumberServiceImpl, InvoiceDetailedRepository invoiceDetailedRepository,
-			InvoiceRepository invoiceRepository) {
+			InvoiceRepository invoiceRepository, PatientRepository patientRepository,
+			InvoiceServiceImpl invoiceServiceImpl) {
 		this.cmaConfig = cmaConfig;
 		this.countIdRepository = countIdRepository;
 		this.roomServiceRepository = roomServiceRepository;
@@ -62,6 +67,8 @@ public class ScheduledService {
 		this.ordinalNumberServiceImpl = ordinalNumberServiceImpl;
 		this.invoiceDetailedRepository = invoiceDetailedRepository;
 		this.invoiceRepository = invoiceRepository;
+		this.patientRepository = patientRepository;
+		this.invoiceServiceImpl = invoiceServiceImpl;
 	}
 
 	// Send public ip to gateway server
@@ -104,6 +111,7 @@ public class ScheduledService {
 		resetRoomInformation();
 		deleteOldAppointment();
 		createOrdinalNumberAppointment();
+		caculatePatientDebt();
 	}
 
 	private void resetMedicalAndPatientCodeCount() {
@@ -165,6 +173,13 @@ public class ScheduledService {
 				ide.setStatus(2);
 				invoiceDetailedRepository.save(ide);
 			}
+		}
+	}
+
+	private void caculatePatientDebt() {
+		List<PatientEntity> listPatient = patientRepository.findAll();
+		for (PatientEntity p : listPatient) {
+			invoiceServiceImpl.updateDebtPatient(p);
 		}
 	}
 }

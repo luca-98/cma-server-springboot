@@ -38,6 +38,24 @@ public class ReceivePatientTest extends CmaBaseTest {
 		token = "Bearer" + tokenAuthenticationService.generateToken(mockUser.getUserName());
 	}
 
+    @Test
+	void autoSearhNameReceive() throws Exception {
+		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+		requestParams.add("name", "duc");
+		mockMvc.perform(get("/patient/search-by-name").params(requestParams)
+				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+	}
+
+	@Test
+	void autoSearhNameReceiveBad() throws Exception {
+		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+		requestParams.add("name", "duc");
+		mockMvc.perform(get("/patient/search-by-name")
+				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().is(400));
+	}
+    
 	@Test
 	void addPatientReceive() throws Exception {
 		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
@@ -59,6 +77,26 @@ public class ReceivePatientTest extends CmaBaseTest {
 	}
 
 	@Test
+	void addPatientReceiveBad() throws Exception {
+		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+		requestParams.add("patientCode", "BN291020000");
+		requestParams.add("patientName", "Đỗ Trung Đức");
+		requestParams.add("phone", "0962481497");
+		requestParams.add("dateOfBirth", "1/2/1998");
+		requestParams.add("gender", "0");
+		requestParams.add("address", "Hải Phòng");
+		requestParams.add("ordinalNumber", "3");
+		requestParams.add("clinicalExamPrice", "250,000");
+		requestParams.add("roomServiceId", "8c2ec956-11ee-44d5-b6f6-e94deb94c596");
+		requestParams.add("staffId", "d1841b7c-efe8-463a-aa75-dacf8720f471");
+		requestParams.add("debt", "0");
+		requestParams.add("examinationReason", "aa");
+		mockMvc.perform(post("/receive-patient/add-patient-receive")
+				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().is(400));
+	}
+
+	@Test
 	void getListPatientReceive() throws Exception {
 		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
 		requestParams.add("pageSize", "10");
@@ -66,5 +104,15 @@ public class ReceivePatientTest extends CmaBaseTest {
 		mockMvc.perform(get("/receive-patient/get-patient-receive").params(requestParams)
 				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+	}
+
+	@Test
+	void getListPatientReceiveBad() throws Exception {
+		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+		requestParams.add("pageSize", "10");
+		requestParams.add("pageIndex", "1");
+		mockMvc.perform(get("/receive-patient/get-patient-receive")
+				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().is(400));
 	}
 }

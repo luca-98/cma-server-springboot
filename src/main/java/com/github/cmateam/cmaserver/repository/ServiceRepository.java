@@ -26,7 +26,7 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, UUID> {
 	@Query("select s from ServiceEntity s where s.serviceNameSearch like ?1 and s.status = 1")
 	List<ServiceEntity> autoSearchByName(String serviceName, Pageable pageable);
 
-	@Query("select s from ServiceEntity s where s.status <> 0 order by s.createdAt DESC")
+	@Query("select s from ServiceEntity s where s.status <> 0 order by s.serviceNameSearch ASC")
 	List<ServiceEntity> getAllServicePagging(Pageable pageable);
 
 	@Query("select count(s.id) from ServiceEntity s where s.status <> 0")
@@ -35,13 +35,13 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, UUID> {
 	@Query("select s.serviceName from ServiceEntity s where s.status <> 0 order by s.createdAt DESC")
 	List<String> getAllServiceName();
 
-	@Query("select s from ServiceEntity s where s.serviceNameSearch like ?1 and s.status <> 0 order by s.createdAt DESC")
+	@Query("select s from ServiceEntity s where s.serviceNameSearch like ?1 and s.status <> 0 order by s.serviceNameSearch ASC")
 	List<ServiceEntity> getAllServiceByNamePagging(String serviceNameSearch, Pageable pageable);
 
 	@Query("select count(s.id) from ServiceEntity s where s.serviceNameSearch like ?1 and s.status <> 0")
 	Integer countAllServiceByNamePagging(String serviceNameSearch);
 
-	@Query("select s from ServiceEntity s join s.groupServiceByGroupServiceId gs where s.serviceNameSearch like ?1 and gs.id = ?2 and s.status <> 0 order by s.createdAt DESC")
+	@Query("select s from ServiceEntity s join s.groupServiceByGroupServiceId gs where s.serviceNameSearch like ?1 and gs.id = ?2 and s.status <> 0 order by s.serviceNameSearch ASC")
 	List<ServiceEntity> getAllServiceByNameAndIdGroupPagging(String serviceNameSearch, UUID groupId, Pageable pageable);
 
 	@Query("select count(s.id) from ServiceEntity s join s.groupServiceByGroupServiceId gs where s.serviceNameSearch like ?1 and gs.id = ?2 and s.status <> 0")

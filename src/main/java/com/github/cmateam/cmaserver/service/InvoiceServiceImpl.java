@@ -201,17 +201,36 @@ public class InvoiceServiceImpl {
 							invoice.getAmountPaid() + invoiceSaveListDTO.getLstInvoidDetailListInvoiceSave().get(i)
 									.getLstInvoidDetailsSave().get(index).getAmountPaidInvoiceDetail());
 					invoice = invoiceRepository.save(invoice);
-
-					PatientEntity patientEntity = invoice.getPatientByPatientId();
-					patientEntity.setDebt(invoice.getTotalAmount() - invoice.getAmountPaid());
-					patientEntity = patientRepository.save(patientEntity);
 				}
 			}
+
+			PatientEntity patientEntity = invoiceEntity.getPatientByPatientId();
+			updateDebtPatient(patientEntity);
 		}
+
 		if (lstInvoiceEntities.isEmpty()) {
 			return false;
 		} else {
 			return true;
 		}
+	}
+
+	public void updateDebtPatient(PatientEntity patientEntity) {
+		Long debt = 0L;
+
+		List<InvoiceEntity> listInvoice = patientEntity.getInvoicesById();
+		if (listInvoice != null) {
+			for (InvoiceEntity i : listInvoice) {
+				List<InvoiceDetailedEntity> listDetail = i.getInvoiceDetailedsById();
+				if (listDetail != null) {
+					for (InvoiceDetailedEntity detail : listDetail) {
+						debt += (detail.getAmount() - detail.getAmountPaid());
+					}
+				}
+			}
+		}
+
+		patientEntity.setDebt(debt);
+		patientEntity = patientRepository.save(patientEntity);
 	}
 }

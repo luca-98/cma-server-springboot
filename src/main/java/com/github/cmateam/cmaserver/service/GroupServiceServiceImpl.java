@@ -98,6 +98,7 @@ public class GroupServiceServiceImpl {
 
 	public Boolean createNewGroupService(GroupServiceAddEditDTO groupServiceAddEditDTO) {
 		GroupServiceEntity groupServiceEntity = new GroupServiceEntity();
+		groupServiceEntity.setId(UUID.randomUUID());
 		groupServiceEntity.setCreatedAt(new Date());
 		groupServiceEntity.setUpdatedAt(new Date());
 		groupServiceEntity.setStatus(1);
@@ -106,7 +107,7 @@ public class GroupServiceServiceImpl {
 			return false;
 		} else {
 			groupServiceEntity.setGroupServiceName(groupServiceAddEditDTO.getGroupServiceName().trim());
-			groupServiceEntity.setGroupServiceCode("OTHER");
+			groupServiceEntity.setGroupServiceCode(groupServiceEntity.getId().toString());
 		}
 		List<StaffEntity> lstEntity = new ArrayList<>();
 		for (int i = 0; i < groupServiceAddEditDTO.getLststaff().size(); i++) {
@@ -128,7 +129,6 @@ public class GroupServiceServiceImpl {
 		groupServiceEntity.setUpdatedAt(new Date());
 		groupServiceEntity.setStatus(1);
 		groupServiceEntity.setGroupServiceName(groupServiceAddEditDTO.getGroupServiceName().trim());
-		groupServiceEntity.setGroupServiceCode("OTHER");
 		List<StaffEntity> lstEntity = new ArrayList<>();
 		for (int i = 0; i < groupServiceAddEditDTO.getLststaff().size(); i++) {
 			lstEntity.add(staffRepository.getOne(groupServiceAddEditDTO.getLststaff().get(i)));

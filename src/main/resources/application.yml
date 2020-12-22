@@ -32,7 +32,7 @@ spring:
 spring:
     profiles: dev
     datasource:
-        url: jdbc:postgresql://34.96.187.193:5432/postgres?currentSchema=cma
+        url: jdbc:postgresql://localhost:5432/postgres?currentSchema=cma
         username: postgres
         password: "!CM@T3am_P@sSw0rd"
     flyway:
@@ -43,7 +43,7 @@ spring:
 spring:
     profiles: test
     datasource:
-        url: jdbc:postgresql://116.101.25.228:5432/postgres?currentSchema=cma
+        url: jdbc:postgresql://116.107.239.182:5432/postgres?currentSchema=cma
         username: postgres
         password: "!CM@T3am_P@sSw0rd"
 

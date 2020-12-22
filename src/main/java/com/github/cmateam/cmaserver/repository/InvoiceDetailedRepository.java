@@ -12,17 +12,17 @@ import com.github.cmateam.cmaserver.entity.InvoiceDetailedEntity;
 import com.github.cmateam.cmaserver.entity.PatientEntity;
 
 public interface InvoiceDetailedRepository extends JpaRepository<InvoiceDetailedEntity, UUID> {
-	@Query("select id from InvoiceDetailedEntity id join id.invoiceByInvoiceId i join i.patientByPatientId p where i.totalAmount > i.amountPaid and i.status = 2 and p.id = ?1 order by id.createdAt DESC")
+	@Query("select id from InvoiceDetailedEntity id join id.invoiceByInvoiceId i join i.patientByPatientId p where i.totalAmount > i.amountPaid and i.status = 2 and id.status = 2 and id.amount > id.amountPaid and p.id = ?1 order by id.createdAt DESC")
 	List<InvoiceDetailedEntity> getListInvoiceDetialDebtByPatientId(UUID patientId, Pageable pageable);
 
-	@Query("select count(id.id) from InvoiceDetailedEntity id join id.invoiceByInvoiceId i join i.patientByPatientId p where i.totalAmount > i.amountPaid and i.status = 2 and p.id = ?1")
+	@Query("select count(id.id) from InvoiceDetailedEntity id join id.invoiceByInvoiceId i join i.patientByPatientId p where i.totalAmount > i.amountPaid and i.status = 2 and id.status = 2 and id.amount > id.amountPaid and p.id = ?1")
 	Integer countAllListInvoiceDetialDebtByPatientId(UUID patientId);
 
-	@Query("select id from InvoiceDetailedEntity id join id.invoiceByInvoiceId i join i.patientByPatientId p where i.totalAmount > i.amountPaid and i.status = 2 and p.id = ?1 and date_trunc('day', i.createdAt) between ?2 and ?3 order by id.createdAt DESC")
+	@Query("select id from InvoiceDetailedEntity id join id.invoiceByInvoiceId i join i.patientByPatientId p where i.totalAmount > i.amountPaid and i.status = 2 and id.status = 2 and id.amount > id.amountPaid and p.id = ?1 and date_trunc('day', i.createdAt) between ?2 and ?3 order by id.createdAt DESC")
 	List<InvoiceDetailedEntity> getListInvoiceDetialDebtByPatientIdAndDate(UUID patientId, Date startDate, Date endDate,
 			Pageable pageable);
 
-	@Query("select count(id.id) from InvoiceDetailedEntity id join id.invoiceByInvoiceId i join i.patientByPatientId p where i.totalAmount > i.amountPaid and i.status = 2 and p.id = ?1 and date_trunc('day', i.createdAt) between ?2 and ?3")
+	@Query("select count(id.id) from InvoiceDetailedEntity id join id.invoiceByInvoiceId i join i.patientByPatientId p where i.totalAmount > i.amountPaid and i.status = 2 and id.status = 2 and id.amount > id.amountPaid and p.id = ?1 and date_trunc('day', i.createdAt) between ?2 and ?3")
 	Integer countAllListInvoiceDetialDebtByPatientIdAndDate(UUID patientId, Date startDate, Date endDate);
 
 	@Query("select distinct p from InvoiceEntity i join i.patientByPatientId p where i.totalAmount > i.amountPaid and i.status = 2 and p.patientNameSearch like ?1")

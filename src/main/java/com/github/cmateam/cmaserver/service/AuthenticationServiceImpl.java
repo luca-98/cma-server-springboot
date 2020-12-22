@@ -1,5 +1,6 @@
 package com.github.cmateam.cmaserver.service;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -16,10 +17,13 @@ import com.github.cmateam.cmaserver.repository.AppUserRepository;
 import com.github.cmateam.cmaserver.repository.PermissionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -105,5 +109,19 @@ public class AuthenticationServiceImpl {
 	private boolean isAuthenticated(Authentication authentication) {
 		return authentication != null && !(authentication instanceof AnonymousAuthenticationToken)
 				&& authentication.isAuthenticated();
+	}
+
+	public ResponseEntity<?> changePassword(String oldPassword, String newPassword, Principal principal) {
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		String username = principal.getName();
+
+		AppUserEntity appUserEntity = appUserRepository.findByUserName(username);
+		if (!passwordEncoder.matches(oldPassword, appUserEntity.getEncryptedPassword())) {
+			return ResponseEntity.status(HttpStatus.OK).body(false);
+		}
+		String newEncryptPassword = passwordEncoder.encode(newPassword);
+		appUserEntity.setEncryptedPassword(newEncryptPassword);
+		appUserRepository.save(appUserEntity);
+		return ResponseEntity.status(HttpStatus.OK).body(true);
 	}
 }

@@ -27,3 +27,10 @@ cd {your-custom-folder}\cma-server
 ```
 mvn spring-boot:run
 ```
+
+
+### 4. Generate Test Report 
+
+```
+ mvn clean install test surefire-report:report
+```

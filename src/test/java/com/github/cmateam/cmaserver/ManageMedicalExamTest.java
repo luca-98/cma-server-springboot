@@ -20,8 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 
-public class PatientTest extends CmaBaseTest {
-    
+public class ManageMedicalExamTest extends CmaBaseTest {
 	private String token;
 	private UUID userId = UUID.fromString("87a5d03f-e810-42cf-8ef9-5c92a5302790");
 	private AppUserEntity mockUser;
@@ -36,44 +35,51 @@ public class PatientTest extends CmaBaseTest {
 	public void setUp() throws Exception {
 		mockUser = appUserRepository.getOne(userId);
 		token = "Bearer" + tokenAuthenticationService.generateToken(mockUser.getUserName());
-    }
-    
-    @Test
-	void getListPatientReceive() throws Exception {
+	}
+	
+	@Test
+	void getAllDisease() throws Exception {
 		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-		requestParams.add("pageSize", "25");
-		requestParams.add("pageIndex", "0");
-		mockMvc.perform(get("/patient/get-all-patient").params(requestParams)
+		requestParams.add("icd10Code", "A");
+		mockMvc.perform(get("/disease/get-disease-by-code").params(requestParams)
 				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 	}
-    
-    @Test
-	void getAllPatient() throws Exception {
+	
+	@Test
+	void getMedicalExamById() throws Exception {
 		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-		requestParams.add("pageSize", "25");
-		requestParams.add("pageIndex", "0");
-		mockMvc.perform(get("/patient/get-all-patient").params(requestParams)
+		requestParams.add("id", "b712f15c-f3bd-4e35-a318-8fa72ee39536");
+		mockMvc.perform(get("/medical-examination/get-medical-exam")
+				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().is(400));
+	}
+	
+	@Test
+	void getHistory() throws Exception {
+		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+		requestParams.add("id", "5c6b9c29-d9cd-4a49-bd28-c184f302f129");
+		mockMvc.perform(get("/patient/get-history").params(requestParams)
 				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 	}
 
+	// -----
+
 	@Test
-	void getListPatientReceiveBad() throws Exception {
+	void getAllDiseaseBad() throws Exception {
 		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-		requestParams.add("pageSize", "25");
-		requestParams.add("pageIndex", "0");
-		mockMvc.perform(get("/patient/get-all-patient")
+		requestParams.add("icd10Code", "A");
+		mockMvc.perform(get("/disease/get-disease-by-code")
 				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().is(400));
 	}
-    
-    @Test
-	void getAllPatientBad() throws Exception {
+	
+	@Test
+	void getHistorBady() throws Exception {
 		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-		requestParams.add("pageSize", "25");
-		requestParams.add("pageIndex", "0");
-		mockMvc.perform(get("/patient/get-all-patient")
+		requestParams.add("id", "5c6b9c29-d9cd-4a49-bd28-c184f302f129");
+		mockMvc.perform(get("/patient/get-history")
 				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().is(400));
 	}

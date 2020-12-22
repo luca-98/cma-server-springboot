@@ -1,6 +1,7 @@
 package com.github.cmateam.cmaserver.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -99,9 +100,13 @@ public class RoomServiceServiceImpl {
 		roomServiceDTO.setUnitName(rs.getUnitName());
 		roomServiceDTO.setTotalReceive(rs.getTotalReceive());
 		roomServiceDTO.setTotalDone(rs.getTotalDone());
+		roomServiceDTO.setUpdatedAt(rs.getUpdatedAt());
+		List<StaffEntity> listStaff = rs.getStaffsByStaffId();
 		List<UUID> staffIdList = new ArrayList<>();
-		for (StaffEntity s : rs.getStaffsByStaffId()) {
-			staffIdList.add(s.getId());
+		if (listStaff != null) {
+			for (StaffEntity s : listStaff) {
+				staffIdList.add(s.getId());
+			}
 		}
 		roomServiceDTO.setStaffIdList(staffIdList);
 		return roomServiceDTO;
@@ -125,5 +130,31 @@ public class RoomServiceServiceImpl {
 		} else {
 			return staff.getRoomServicesById().get(0).getId();
 		}
+	}
+
+	public RoomServiceDTO createNew(RoomServiceEntity room) {
+		room.setUnitName("lần");
+		room.setTotalReceive((short) 0);
+		room.setTotalDone((short) 0);
+		room.setStatus(1);
+		room.setCreatedAt(new Date());
+		room.setUpdatedAt(new Date());
+
+		room = roomServiceRepository.save(room);
+		return convertEntityToDTO(room);
+	}
+
+	public RoomServiceDTO updateRoomService(RoomServiceEntity room) {
+		RoomServiceEntity oldRoom = roomServiceRepository.getOne(room.getId());
+		oldRoom.setRoomName(room.getRoomName());
+		oldRoom.setUpdatedAt(new Date());
+		oldRoom = roomServiceRepository.save(oldRoom);
+		return convertEntityToDTO(oldRoom);
+	}
+
+	public void deleteRoomService(UUID id) {
+		RoomServiceEntity room = roomServiceRepository.getOne(id);
+		room.setStatus(0);
+		roomServiceRepository.save(room);
 	}
 }

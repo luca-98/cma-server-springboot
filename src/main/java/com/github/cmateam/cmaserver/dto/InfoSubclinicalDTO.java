@@ -15,6 +15,7 @@ public class InfoSubclinicalDTO {
     private String dateOfBirthStr;
     private Integer gender;
     private String address;
+    private Integer medicalExamStatus;
     private List<SubclinicalAppointDTO> listAppoint;
 
     public UUID getMedicalExamId() {
@@ -95,6 +96,14 @@ public class InfoSubclinicalDTO {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Integer getMedicalExamStatus() {
+        return this.medicalExamStatus;
+    }
+
+    public void setMedicalExamStatus(Integer medicalExamStatus) {
+        this.medicalExamStatus = medicalExamStatus;
     }
 
     public List<SubclinicalAppointDTO> getListAppoint() {

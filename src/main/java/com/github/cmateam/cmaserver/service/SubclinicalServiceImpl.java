@@ -171,6 +171,7 @@ public class SubclinicalServiceImpl {
             sdto.setStatus(s.getStatus());
             listAppoint.add(sdto);
         }
+        ret.setMedicalExamStatus(medicalExam.getStatus());
         ret.setListAppoint(listAppoint);
         return ret;
     }
@@ -417,6 +418,7 @@ public class SubclinicalServiceImpl {
             sdto.setNote(s.getNote());
             listAppointRet.add(sdto);
         }
+        ret.setMedicalExamStatus(mee.getStatus());
         ret.setListAppoint(listAppointRet);
         return ret;
     }
@@ -454,6 +456,7 @@ public class SubclinicalServiceImpl {
             sdto.setHtmlReport(s.getHtmlReport());
             listAppoint.add(sdto);
         }
+        infoSubclinicalDTO.setMedicalExamStatus(m.getStatus());
         infoSubclinicalDTO.setListAppoint(listAppoint);
 
         return ResponseEntity.status(HttpStatus.OK).body(infoSubclinicalDTO);

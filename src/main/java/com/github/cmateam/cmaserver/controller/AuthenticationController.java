@@ -1,5 +1,7 @@
 package com.github.cmateam.cmaserver.controller;
 
+import java.security.Principal;
+
 import com.github.cmateam.cmaserver.dto.UserLoginDTO;
 import com.github.cmateam.cmaserver.service.AuthenticationServiceImpl;
 
@@ -31,5 +33,11 @@ public class AuthenticationController {
         } else {
             return ResponseEntity.status(HttpStatus.OK).body(result);
         }
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestParam("oldPassword") String oldPassword,
+            @RequestParam("newPassword") String newPassword, Principal principal) {
+        return authenticationServiceImpl.changePassword(oldPassword, newPassword, principal);
     }
 }

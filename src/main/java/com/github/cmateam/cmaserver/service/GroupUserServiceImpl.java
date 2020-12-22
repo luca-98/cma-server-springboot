@@ -114,8 +114,9 @@ public class GroupUserServiceImpl {
         }
 
         UserGroupEntity userGroupEntity = new UserGroupEntity();
+        userGroupEntity.setId(UUID.randomUUID());
         userGroupEntity.setUserGroupName(groupName);
-        userGroupEntity.setUserGroupCode("OTHER");
+        userGroupEntity.setUserGroupCode(userGroupEntity.getId().toString());
         userGroupEntity.setStatus(1);
         userGroupEntity.setCreatedAt(new Date());
         userGroupEntity.setUpdatedAt(new Date());
@@ -147,7 +148,7 @@ public class GroupUserServiceImpl {
             return ret;
         }
         userGroupEntity.setUserGroupName(groupName);
-        userGroupEntity.setUserGroupCode("OTHER");
+        userGroupEntity.setUserGroupCode(userGroupEntity.getId().toString());
         userGroupEntity.setStatus(1);
         userGroupEntity.setUpdatedAt(new Date());
         userGroupEntity.setPermissionsById(listP);

@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.github.cmateam.cmaserver.service.TokenAuthenticationService;
 import com.github.cmateam.cmaserver.service.UserDetailsServiceImpl;
@@ -15,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.GenericFilterBean;
 
 // Đọc token JWT từ tất cả request gửi lên
@@ -40,7 +42,14 @@ public class JWTAuthenticationFilter extends GenericFilterBean {
             return;
         }
 
-        UserDetails currentUser = userDetailsService.loadUserByUsername(userName);
+        UserDetails currentUser = null;
+        try {
+            currentUser = userDetailsService.loadUserByUsername(userName);
+        } catch (UsernameNotFoundException ex) {
+            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
+            chain.doFilter(request, response);
+            return;
+        }
         Authentication authentication = new UsernamePasswordAuthenticationToken(currentUser, null,
                 currentUser.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);

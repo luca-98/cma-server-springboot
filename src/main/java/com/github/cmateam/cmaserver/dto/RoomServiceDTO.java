@@ -1,5 +1,6 @@
 package com.github.cmateam.cmaserver.dto;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,6 +10,7 @@ public class RoomServiceDTO {
 	private String unitName;
 	private Short totalReceive;
 	private Short totalDone;
+	private Date updatedAt;
 	private List<UUID> staffIdList;
 
 	public void setId(UUID id) {
@@ -49,6 +51,14 @@ public class RoomServiceDTO {
 
 	public Short getTotalReceive() {
 		return totalReceive;
+	}
+
+	public Date getUpdatedAt() {
+		return this.updatedAt;
+	}
+
+	public void setUpdatedAt(Date updatedAt) {
+		this.updatedAt = updatedAt;
 	}
 
 	public List<UUID> getStaffIdList() {

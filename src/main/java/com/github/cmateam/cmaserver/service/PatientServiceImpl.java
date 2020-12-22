@@ -290,7 +290,7 @@ public class PatientServiceImpl {
 					patient.setAddressSearch(
 							vNCharacterUtils.removeAccent(row.getCell(3).getStringCellValue()).toLowerCase());
 					patient.setPhone(row.getCell(4).getStringCellValue());
-					patient.setDebt((long) (row.getCell(5).getNumericCellValue()));
+					patient.setDebt(0L);
 					patient.setStatus(1);
 					patient.setCreatedAt(new Date());
 					patient.setUpdatedAt(new Date());

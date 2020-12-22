@@ -1,0 +1,1 @@
+INSERT INTO permission VALUES ('11f0e0d8-6096-48fe-9724-64ea2dc3a456', 'G40', 'Quản lý phòng làm việc', 1, '2020-12-05 11:05:34.455795', '2020-12-05 11:05:47.108736');

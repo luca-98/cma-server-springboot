@@ -20,8 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 
-public class PatientTest extends CmaBaseTest {
-    
+public class ReportTest extends CmaBaseTest {
 	private String token;
 	private UUID userId = UUID.fromString("87a5d03f-e810-42cf-8ef9-5c92a5302790");
 	private AppUserEntity mockUser;
@@ -36,45 +35,42 @@ public class PatientTest extends CmaBaseTest {
 	public void setUp() throws Exception {
 		mockUser = appUserRepository.getOne(userId);
 		token = "Bearer" + tokenAuthenticationService.generateToken(mockUser.getUserName());
-    }
-    
-    @Test
-	void getListPatientReceive() throws Exception {
-		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-		requestParams.add("pageSize", "25");
-		requestParams.add("pageIndex", "0");
-		mockMvc.perform(get("/patient/get-all-patient").params(requestParams)
-				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
-	}
-    
-    @Test
-	void getAllPatient() throws Exception {
-		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-		requestParams.add("pageSize", "25");
-		requestParams.add("pageIndex", "0");
-		mockMvc.perform(get("/patient/get-all-patient").params(requestParams)
-				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 	}
 
 	@Test
-	void getListPatientReceiveBad() throws Exception {
-		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-		requestParams.add("pageSize", "25");
-		requestParams.add("pageIndex", "0");
-		mockMvc.perform(get("/patient/get-all-patient")
-				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().is(400));
+	void getYearReport() throws Exception {
+		mockMvc.perform(get("/report-sum/get-year-report").header(HttpHeaders.AUTHORIZATION, token)
+				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 	}
-    
-    @Test
-	void getAllPatientBad() throws Exception {
+
+	@Test
+	void showReportSum() throws Exception {
 		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-		requestParams.add("pageSize", "25");
-		requestParams.add("pageIndex", "0");
-		mockMvc.perform(get("/patient/get-all-patient")
-				.header(HttpHeaders.AUTHORIZATION, token).accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().is(400));
+		requestParams.add("fromDate", "14/12/2020");
+		requestParams.add("toDate", "14/12/2020");
+		requestParams.add("year", "2020");
+		requestParams.add("type", "2");
+		mockMvc.perform(
+				get("/report-sum/show-report-sum").params(requestParams).header(HttpHeaders.AUTHORIZATION, token)
+						.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void getYearReportAuthen() throws Exception {
+		mockMvc.perform(get("/report-sum/get-year-report").accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().is(403));
+	}
+
+	@Test
+	void showReportSumBad() throws Exception {
+		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+		requestParams.add("fromDate", "14/12/2020");
+		requestParams.add("toDate", "14/12/2020");
+		requestParams.add("year", "2020");
+		requestParams.add("type", "2");
+		mockMvc.perform(get("/report-sum/show-report-sum").header(HttpHeaders.AUTHORIZATION, token)
+				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().is(400));
 	}
 }
