@@ -32,14 +32,17 @@ public class InvoiceServiceImpl {
 	private VNCharacterUtils vNCharacterUtils;
 	private InvoiceDetailedRepository invoiceDetailedRepository;
 	private PatientRepository patientRepository;
+	private WebSocketService webSocketService;
 
 	@Autowired
 	public InvoiceServiceImpl(InvoiceRepository invoiceRepository, VNCharacterUtils vNCharacterUtils,
-			InvoiceDetailedRepository invoiceDetailedRepository, PatientRepository patientRepository) {
+			InvoiceDetailedRepository invoiceDetailedRepository, PatientRepository patientRepository,
+			WebSocketService webSocketService) {
 		this.invoiceRepository = invoiceRepository;
 		this.vNCharacterUtils = vNCharacterUtils;
 		this.invoiceDetailedRepository = invoiceDetailedRepository;
 		this.patientRepository = patientRepository;
+		this.webSocketService = webSocketService;
 	}
 
 	public List<PatientDTO> searchByName(String name) {
@@ -207,6 +210,7 @@ public class InvoiceServiceImpl {
 			PatientEntity patientEntity = invoiceEntity.getPatientByPatientId();
 			updateDebtPatient(patientEntity);
 		}
+		webSocketService.updatePaymentStatus();
 
 		if (lstInvoiceEntities.isEmpty()) {
 			return false;
@@ -221,10 +225,21 @@ public class InvoiceServiceImpl {
 		List<InvoiceEntity> listInvoice = patientEntity.getInvoicesById();
 		if (listInvoice != null) {
 			for (InvoiceEntity i : listInvoice) {
-				List<InvoiceDetailedEntity> listDetail = i.getInvoiceDetailedsById();
-				if (listDetail != null) {
-					for (InvoiceDetailedEntity detail : listDetail) {
-						debt += (detail.getAmount() - detail.getAmountPaid());
+				if (i.getStatus() != 0) {
+					List<InvoiceDetailedEntity> listDetail = i.getInvoiceDetailedsById();
+					if (listDetail != null) {
+						for (InvoiceDetailedEntity detail : listDetail) {
+							if (detail.getStatus() != 0) {
+								if (detail.getAmount() == null || detail.getAmountPaid() == null) {
+									detail.setAmount(0L);
+									detail.setAmountPaid(0L);
+								}
+								if (detail.getAmountPaid() > detail.getAmount()) {
+									detail.setAmountPaid(detail.getAmount());
+								}
+								debt += (detail.getAmount() - detail.getAmountPaid());
+							}
+						}
 					}
 				}
 			}

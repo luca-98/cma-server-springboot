@@ -72,6 +72,6 @@ public interface PatientRepository extends JpaRepository<PatientEntity, UUID> {
 	Integer countAllByPatientWithAllPagging(String patientCode, String patientNameSearch, String phone,
 			String addressSearch, Integer yearOfBirth, Integer gender);
 
-	@Query("select r.patientByPatientId.id from ReceivePatientEntity r where r.status <> 0")
+	@Query("select r.patientByPatientId.id from ReceivePatientEntity r where r.status <> 0 AND date_trunc('day', r.createdAt)=date_trunc('day', now())")
 	List<UUID> getAllPatientInReceiveWithStatus();
 }

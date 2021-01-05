@@ -13,6 +13,9 @@ public class WebSocketService {
     private static final String SUBSCRIBE_TOPIC_UPDATE_ROOM_SERVICE = "/topic/room-service";
     private static final String SUBSCRIBE_TOPIC_UPDATE_ORDINAL_NUMBER = "/topic/ordinal-number";
     private static final String SUBSCRIBE_TOPIC_UPDATE_PERMISSION = "/topic/permission";
+    private static final String SUBSCRIBE_TOPIC_PAYMENT_STATUS = "/topic/payment-status";
+    private static final String SUBSCRIBE_TOPIC_CLINICAL_EXAM_LIST = "/topic/clinical-list";
+    private static final String SUBSCRIBE_TOPIC_SUBCLINICAL_LIST = "/topic/subclinical-list";
 
     private SimpMessagingTemplate simpMessagingTemplate;
 
@@ -35,5 +38,17 @@ public class WebSocketService {
 
     public void updatePermission() {
         simpMessagingTemplate.convertAndSend(SUBSCRIBE_TOPIC_UPDATE_PERMISSION, true);
+    }
+
+    public void updatePaymentStatus() {
+        simpMessagingTemplate.convertAndSend(SUBSCRIBE_TOPIC_PAYMENT_STATUS, true);
+    }
+
+    public void updateClinicalExamList() {
+        simpMessagingTemplate.convertAndSend(SUBSCRIBE_TOPIC_CLINICAL_EXAM_LIST, true);
+    }
+
+    public void updateSubclinicalList() {
+        simpMessagingTemplate.convertAndSend(SUBSCRIBE_TOPIC_SUBCLINICAL_LIST, true);
     }
 }
